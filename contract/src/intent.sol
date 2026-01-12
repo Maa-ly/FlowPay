@@ -14,6 +14,8 @@ struct PaymentIntent {
 }
 
 
+ // make a factory , user can clone multiple intents?
+
 contract Intent {
  
 
@@ -26,7 +28,8 @@ contract Intent {
  uint256 public intentCount;
 
  event IntentCreated(uint256 intentId, address indexed owner, address indexed recipient, uint256 amount, uint256 minBalance);
-    
+ event IntentExecuted(uint256 intentId, uint256 timestamp);
+ event IntentDeactivated(uint256 intentId);
 
     constructor() {
     }
@@ -55,6 +58,32 @@ contract Intent {
        emit IntentCreated(intent_id, msg.sender, recipient, amount, minBalance);
        return intent_id; 
 
+    }
+
+
+
+    function executeIntent(uint256 intentId) public {
+        PaymentIntent storage paymentIntent = intents[intentId];
+        require(paymentIntent.active, "Intent is not active");
+        require(block.timestamp >= paymentIntent.lastExecuted + paymentIntent.interval, "Interval not reached");
+
+         // pay recipient logic , question is how to handle the funds?
+         // the reciepient could be something else than an EOA, could be a user without EOA
+         // eg rent , phone bill, subscription etc.
+         // for now we just update the last executed timestamp
+         // talk to teammates about this part
+
+         // so we can setup an escrow contract to hold the funds and pay out when executed
+        paymentIntent.lastExecuted = block.timestamp;
+        paymentIntent.active = false; // deactivate after 
+        emit IntentExecuted(intentId, block.timestamp);
+    }
+
+    function deactivateIntent(uint256 intentId) public {
+        PaymentIntent storage paymentIntent = intents[intentId];
+        require(paymentIntent.owner == msg.sender, "Only owner can deactivate");
+        paymentIntent.active = false;
+        emit IntentDeactivated(intentId);
     }
 
     function getIntent(uint256 intentId) public view returns (PaymentIntent memory) {
