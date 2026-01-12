@@ -1,0 +1,25 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22c55e"/>
+      <stop offset="50%" stop-color="#16a34a"/>
+      <stop offset="100%" stop-color="#15803d"/>
+    </linearGradient>
+    <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.7"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="240" fill="url(#iconGradient)"/>
+  
+  <!-- Flowing wave pattern -->
+  <path d="M80 256 Q140 180 200 256 T320 256 T440 256" stroke="url(#waveGradient)" stroke-width="40" stroke-linecap="round" fill="none"/>
+  
+  <!-- Second wave -->
+  <path d="M100 320 Q160 250 220 320 T340 320 T420 320" stroke="url(#waveGradient)" stroke-width="24" stroke-linecap="round" fill="none" opacity="0.6"/>
+  
+  <!-- Accent dot -->
+  <circle cx="400" cy="200" r="32" fill="#ffffff" opacity="0.9"/>
+</svg>

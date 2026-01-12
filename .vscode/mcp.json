@@ -1,0 +1,9 @@
+{
+	"servers": {
+		"Cronos EVM Docs": {
+			"url": "https://docs.cronos.org/~gitbook/mcp",
+			"type": "http"
+		}
+	},
+	"inputs": []
+}

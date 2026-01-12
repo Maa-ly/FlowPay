@@ -13,7 +13,7 @@ docs/
 # Dependency directories
 lib/
 
-
+.DS_Store
 
 # Dotenv file
 .env
