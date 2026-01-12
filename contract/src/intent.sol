@@ -19,6 +19,10 @@ contract Intent {
 
  mapping(uint256 => PaymentIntent) public intents;
 
+ uint256[] public intentIds;
+
+ mapping(address => uint256[]) public userIntents;
+
  uint256 public intentCount;
 
  event IntentCreated(uint256 intentId, address indexed owner, address indexed recipient, uint256 amount, uint256 minBalance);
@@ -46,6 +50,7 @@ contract Intent {
             lastExecuted: block.timestamp,
             active: true
         });
+        userIntents[msg.sender].push(intent_id);
 
        emit IntentCreated(intent_id, msg.sender, recipient, amount, minBalance);
        return intent_id; 
@@ -57,37 +62,47 @@ contract Intent {
     }
 
     function getUserIntents(address user) public view returns (uint256[] memory) {
-        uint256[] memory userIntents = new uint256[](intentCount);
-        uint256 count = 0;
-        for (uint256 i = 0; i < intentCount; i++) {
-            if (intents[i].owner == user && intents[i].active) {
-                userIntents[count] = i;
-                count++;
+        // we want return all active intents for a user
+        uint256[] memory allIntents = userIntents[user];
+        uint256 activeCount = 0;
+        for (uint256 i = 0; i < allIntents.length; i++) {
+            if (intents[allIntents[i]].active) {
+                activeCount++;
             }
         }
-        // Resize the array to the actual count
-        uint256[] memory result = new uint256[](count);
-        for (uint256 j = 0; j < count; j++) {
-            result[j] = userIntents[j];
+
+        uint256[] memory activeIntents = new uint256[](activeCount);
+        uint256 index = 0;
+        for (uint256 i = 0; i < allIntents.length; i++) {
+            if (intents[allIntents[i]].active) {
+                activeIntents[index] = allIntents[i];
+                index++;
+            }
         }
-        return result;
+
+        return activeIntents;
     }
 
+// usinng better way to get old intents, gas efficient
     function getOldIntents(address user) public view returns (uint256[] memory) {
-        uint256[] memory oldIntents = new uint256[](intentCount);
-        uint256 count = 0;
-        for (uint256 i = 0; i < intentCount; i++) {
-            if (intents[i].owner == user && !intents[i].active) {
-                oldIntents[count] = i;
-                count++;
+        uint256[] memory allIntents = userIntents[user];
+        uint256 oldCount = 0;
+        for (uint256 i = 0; i < allIntents.length; i++) {
+            if (!intents[allIntents[i]].active) {
+                oldCount++;
             }
         }
-        // Resize the array to the actual count
-        uint256[] memory result = new uint256[](count);
-        for (uint256 j = 0; j < count; j++) {
-            result[j] = oldIntents[j];
+
+        uint256[] memory oldIntents = new uint256[](oldCount);
+        uint256 index = 0;
+        for (uint256 i = 0; i < allIntents.length; i++) {
+            if (!intents[allIntents[i]].active) {
+                oldIntents[index] = allIntents[i];
+                index++;
+            }
         }
-        return result;
+
+        return oldIntents;
     }
 
 }
