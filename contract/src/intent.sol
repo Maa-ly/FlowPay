@@ -18,6 +18,9 @@ struct PaymentIntent {
 
 contract Intent {
  
+    address public owner;
+    address public escrowImpl;
+    bool public initialized;
 
  mapping(uint256 => PaymentIntent) public intents;
 
@@ -35,13 +38,28 @@ contract Intent {
     }
 
 
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not owner");
+        _;
+    }
+
+    function initialize(address _owner, address _escrowImpl) external {
+        require(!initialized, "Already initialized");
+        initialized = true;
+
+        owner = _owner;
+        escrowImpl = _escrowImpl;
+    }
+
+
     function createIntent(
         address recipient,
         uint256 amount,
         uint256 minBalance,
         uint256 interval
 
-    ) public returns(uint256 intent_id){
+    ) public onlyOwner returns(uint256 intent_id){
 
       intent_id = intentCount++;
         intents[intent_id] = PaymentIntent({
@@ -84,6 +102,18 @@ contract Intent {
         require(paymentIntent.owner == msg.sender, "Only owner can deactivate");
         paymentIntent.active = false;
         emit IntentDeactivated(intentId);
+    }
+
+    function canExecute(uint256 id, uint256 balance)
+        public
+        view
+        returns (bool)
+    {
+        PaymentIntent memory p = intents[id];
+        if (!p.active) return false;
+        if (block.timestamp < p.lastExecuted + p.interval) return false;
+        if (balance < p.amount + p.minBalance) return false;
+        return true;
     }
 
     function getIntent(uint256 intentId) public view returns (PaymentIntent memory) {
