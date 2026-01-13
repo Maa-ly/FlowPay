@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { ArrowRight, Info, Shield, Wallet } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
+import { ArrowRight, Info, Shield, Wallet, Sparkles } from "lucide-react";
+import { toast } from "sonner";
+import AdvancedConstraintsForm, { AdvancedConstraints } from "./AdvancedConstraintsForm";
+import { IntentTemplate } from "./IntentTemplates";
 
 const frequencies = [
   { value: "weekly", label: "Weekly" },
@@ -22,34 +25,88 @@ const tokens = [
   { value: "ETH", label: "ETH" },
 ];
 
-const CreateIntentForm = () => {
-  const { toast } = useToast();
+interface CreateIntentFormProps {
+  selectedTemplate?: IntentTemplate | null;
+}
+
+const CreateIntentForm = ({ selectedTemplate }: CreateIntentFormProps) => {
+  const [intentName, setIntentName] = useState("");
   const [recipient, setRecipient] = useState("");
   const [amount, setAmount] = useState("");
   const [token, setToken] = useState("USDC");
   const [frequency, setFrequency] = useState("monthly");
   const [safetyBuffer, setSafetyBuffer] = useState([300]);
+  const [constraints, setConstraints] = useState<AdvancedConstraints>({
+    timeWindow: { enabled: false, startHour: 9, endHour: 17 },
+    gasPriceLimit: { enabled: false, maxGwei: 50 },
+    conditions: { logic: "AND", balanceCheck: true, timeCheck: false, gasCheck: false },
+  });
+
+  // Pre-fill form when template is selected
+  useEffect(() => {
+    if (selectedTemplate) {
+      setIntentName(selectedTemplate.name || "");
+      setAmount(selectedTemplate.defaultValues.amount?.toString() || "");
+      setToken(selectedTemplate.defaultValues.token || "USDC");
+      setFrequency(selectedTemplate.defaultValues.frequency?.toLowerCase() || "monthly");
+      setSafetyBuffer([selectedTemplate.defaultValues.safetyBuffer || 300]);
+      toast.success("Template Loaded", {
+        description: `${selectedTemplate.name} template applied successfully`,
+      });
+    }
+  }, [selectedTemplate]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Intent Created!",
-      description: `Payment intent for ${amount} ${token} has been created successfully.`,
+    toast.success("Intent Created!", {
+      description: `${intentName || 'Payment intent'} for ${amount} ${token} has been created successfully.`,
     });
   };
 
   return (
-    <Card className="max-w-2xl mx-auto border-border/50 shadow-card">
-      <CardHeader className="text-center pb-2">
-        <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center mb-4">
-          <Wallet className="w-7 h-7 text-primary-foreground" />
-        </div>
-        <CardTitle className="font-display text-2xl">Create Payment Intent</CardTitle>
-        <CardDescription>Define your payment constraints and let the agent handle execution</CardDescription>
-      </CardHeader>
-      
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="space-y-6">
+      {selectedTemplate && (
+        <Card className="border-primary/20 bg-primary/5">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <Sparkles className="w-5 h-5 text-primary" />
+              <div className="flex-1">
+                <p className="font-medium">Using Template: {selectedTemplate.name}</p>
+                <p className="text-sm text-muted-foreground">{selectedTemplate.description}</p>
+              </div>
+              <Badge variant="outline" className="bg-background">
+                {selectedTemplate.category}
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      <Card className="max-w-2xl mx-auto border-border/50 shadow-card">
+        <CardHeader className="text-center pb-2">
+          <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center mb-4">
+            <Wallet className="w-7 h-7 text-primary-foreground" />
+          </div>
+          <CardTitle className="font-display text-2xl">Create Payment Intent</CardTitle>
+          <CardDescription>Define your payment constraints and let the agent handle execution</CardDescription>
+        </CardHeader>
+        
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Intent Name */}
+          <div className="space-y-2">
+            <Label htmlFor="intentName">Intent Name (Optional)</Label>
+            <Input
+              id="intentName"
+              placeholder="e.g., Monthly Rent, Netflix Subscription"
+              value={intentName}
+              onChange={(e) => setIntentName(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              Give your intent a memorable name to easily track it
+            </p>
+          </div>
+
           {/* Recipient */}
           <div className="space-y-2">
             <Label htmlFor="recipient">Recipient Address</Label>
@@ -157,6 +214,12 @@ const CreateIntentForm = () => {
         </form>
       </CardContent>
     </Card>
+
+    {/* Advanced Constraints */}
+    <div className="max-w-2xl mx-auto">
+      <AdvancedConstraintsForm constraints={constraints} onConstraintsChange={setConstraints} />
+    </div>
+  </div>
   );
 };
 

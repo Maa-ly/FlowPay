@@ -14,6 +14,7 @@ interface DeleteIntentModalProps {
   onOpenChange: (open: boolean) => void;
   onDelete: () => void;
   intentData: {
+    name?: string;
     amount: number;
     token: string;
     recipient: string;
@@ -35,6 +36,9 @@ const DeleteIntentModal = ({ isOpen, onOpenChange, onDelete, intentData }: Delet
           </DialogDescription>
         </DialogHeader>
         <div className="p-4 rounded-lg bg-muted/50 border border-border">
+          {intentData.name && (
+            <p className="font-semibold text-base mb-1">{intentData.name}</p>
+          )}
           <p className="font-medium">{intentData.amount} {intentData.token}</p>
           <p className="text-sm text-muted-foreground font-mono">{intentData.recipient}</p>
           <p className="text-sm text-muted-foreground">{intentData.frequency}</p>

@@ -1,79 +1,414 @@
+# FlowPay Smart Contracts 🔐
 
+Intent-Driven Agentic Payments on Cronos EVM
 
+## 📋 Overview
 
-Intent-Driven Agentic Payments on Cronos (Main Track Submission)
+Smart contracts for FlowPay - an intent-driven, agentic on-chain payments application built on Cronos EVM using x402 programmatic payment flows. These contracts store payment intents, enforce execution rules, and integrate with the x402 facilitator for programmatic settlements.
 
-1. Project Idea Overview
-AutoPay Buddy is an intent-driven, agentic on-chain payments application built on Cronos EVM using x402 programmatic payment flows. The project enables users to express high-level financial intentions—such as paying rent safely, sending allowances when affordable, or automating subscriptions—without manually signing transactions each time.
+## 🏗️ Project Structure
 
-Instead of relying on rigid schedules, AutoPay Buddy introduces a lightweight AI-driven execution agent that evaluates user-defined constraints before triggering payments. These constraints include balance thresholds, safety buffers, timing windows, and priority rules. The agent decides when and whether a payment should be executed, and once approved, settles the transaction using x402-compatible flows on Cronos.
+```
+contract/
+├── src/
+│   └── intent.sol          # Main payment intent contract
+├── test/
+│   └── intent.t.sol        # Contract tests
+├── script/                 # Deployment scripts
+├── foundry.toml            # Foundry configuration
+└── README.md
+```
 
-By combining human-readable intent, adaptive agent logic, and x402-native settlement, AutoPay Buddy demonstrates how everyday financial behaviors can be transformed into intelligent, autonomous on-chain workflows. The project positions x402 as a practical foundation for consumer-facing agentic payments within the Cronos ecosystem.
+## 🛠️ Tech Stack
 
-2. Problem Statement
-Most on-chain payment experiences are either fully manual—requiring repeated user signatures—or overly rigid, executing transactions regardless of a user’s financial context. This makes recurring payments, subscriptions, and allowances risky or inconvenient in Web3.
+- **Solidity** - Smart contract language
+- **Foundry** - Development framework
+  - `forge` - Build, test, deploy
+  - `cast` - Interact with contracts
+  - `anvil` - Local EVM node
+- **Cronos EVM** - Deployment target
+- **x402 Protocol** - Programmatic payment settlement
 
-Users want automation that behaves more like a financial assistant than a timer: payments that respect affordability, adapt to changing balances, and explain why actions were taken or delayed. Current solutions rarely combine this adaptive behavior with secure, programmatic on-chain settlement.
+## 🚀 Getting Started
 
-3. Solution
-AutoPay Buddy solves this by introducing an agentic payment layer on top of Cronos x402. Users define intent and constraints once, and the agent continuously evaluates execution conditions. Payments are only triggered when rules are satisfied, and settlement occurs through x402 flows without repeated user approvals.
+### Prerequisites
 
-This creates a safer, more human-centric automation model while preserving transparency, auditability, and user control.
+1. **Install Foundry:**
+```bash
+curl -L https://foundry.paradigm.xyz | bash
+foundryup
+```
 
-4. MVP Scope
-The MVP focuses on demonstrating a clear end-to-end agentic payment flow using x402 on Cronos EVM. The scope is intentionally minimal to highlight core functionality.
+2. **Verify Installation:**
+```bash
+forge --version
+cast --version
+anvil --version
+```
 
-4.1 Core MVP Features
-- Intent Creation UI:
- Users define a payment intent including recipient, amount, frequency, and safety buffer.
+### Installation
 
-- Agentic Decision Layer:
- A lightweight agent evaluates wallet balance and user-defined constraints before execution.
+```bash
+# Clone and navigate to contract directory
+cd contract
 
-- Conditional Execution:
- Payments are delayed or skipped if constraints (e.g., minimum balance buffer) are violated.
+# Install dependencies
+forge install
+```
 
-- x402 Settlement:
- Approved payments are executed using x402-compatible programmatic payment flows on Cronos.
+## 🧪 Testing
 
-- Transparency & Explainability:
- The UI displays the agent’s decision state (Ready, Delayed, Executed) and reasoning.
+### Run All Tests
 
-4.2 MVP Demo Flow
-1. User creates a payment intent:
-  Example: “Pay 100 USDC rent monthly, but keep at least 300 USDC balance.”
+```bash
+forge test
+```
 
-2. Agent monitors wallet state:
-  The agent checks balance and upcoming execution window.
+### Run Tests with Verbosity
 
-3. Decision phase:
-  If balance minus payment is below the safety buffer, execution is delayed.
+```bash
+# -v    Show test results
+# -vv   Show console.log output
+# -vvv  Show stack traces
+# -vvvv Show setup traces
+# -vvvvv Show everything
+forge test -vvv
+```
 
-4. Execution:
-  Once conditions are satisfied, the agent triggers an x402 settlement on Cronos EVM.
+### Run Specific Test
 
-5. On-chain confirmation:
-  Transaction is visible on Cronos testnet or mainnet.
+```bash
+forge test --match-test testIntentCreation
+```
 
-5. Technical Components (High-Level)
-- Frontend:
- Simple web UI for intent creation and agent status visualization.
+### Run Tests with Gas Report
 
-- Agent Service:
- Off-chain agent logic that evaluates conditions and triggers x402 flows.
+```bash
+forge test --gas-report
+```
 
-- Smart Contracts:
- Contracts deployed on Cronos EVM to store payment intents and enforce execution rules.
+### Coverage Report
 
-- x402 Facilitator SDK:
- Used for programmatic settlement and payment execution.
+```bash
+forge coverage
+```
 
-6. Main Track Alignment
-AutoPay Buddy fits squarely within the Main Track by showcasing:
+## 🔨 Building
 
-- Agent-triggered on-chain actions
-- Practical, consumer-facing x402 use cases
-- Adaptive decision-making rather than fixed automation
-- Clear intent → agent → settlement flow
+```bash
+# Compile contracts
+forge build
 
-The MVP prioritizes clarity, usability, and real-world relevance while demonstrating the power of agentic payments on Cronos.
+# Clean and rebuild
+forge clean && forge build
+```
+
+## 🌍 Deployment
+
+### Deploy to Cronos Testnet
+
+1. **Set Environment Variables:**
+
+Create `.env` file:
+```bash
+PRIVATE_KEY=your_private_key_here
+CRONOS_TESTNET_RPC=https://evm-t3.cronos.org
+CRONOSSCAN_API_KEY=your_cronosscan_api_key
+```
+
+2. **Load Environment:**
+```bash
+source .env
+```
+
+3. **Deploy Contract:**
+```bash
+forge create --rpc-url $CRONOS_TESTNET_RPC \
+  --private-key $PRIVATE_KEY \
+  src/intent.sol:IntentContract \
+  --verify --etherscan-api-key $CRONOSSCAN_API_KEY
+```
+
+4. **Save Contract Address:**
+```bash
+# Output will show: Deployed to: 0x...
+# Save this address for frontend integration
+```
+
+### Deploy to Cronos Mainnet
+
+1. **Get Mainnet CRO:**
+   - Buy CRO on exchange
+   - Withdraw to your wallet address
+
+2. **Update Environment:**
+```bash
+CRONOS_MAINNET_RPC=https://evm.cronos.org
+```
+
+3. **Deploy:**
+```bash
+forge create --rpc-url $CRONOS_MAINNET_RPC \
+  --private-key $PRIVATE_KEY \
+  src/intent.sol:IntentContract \
+  --verify --etherscan-api-key $CRONOSSCAN_API_KEY
+```
+
+### Using Deployment Script
+
+Create `script/Deploy.s.sol`:
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import "forge-std/Script.sol";
+import "../src/intent.sol";
+
+contract DeployScript is Script {
+    function run() external {
+        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+        vm.startBroadcast(deployerPrivateKey);
+
+        IntentContract intent = new IntentContract();
+        console.log("IntentContract deployed to:", address(intent));
+
+        vm.stopBroadcast();
+    }
+}
+```
+
+Deploy with script:
+```bash
+forge script script/Deploy.s.sol:DeployScript \
+  --rpc-url $CRONOS_TESTNET_RPC \
+  --broadcast \
+  --verify
+```
+
+## 🔍 Verification
+
+### Verify Manually
+
+```bash
+forge verify-contract \
+  --chain-id 338 \
+  --compiler-version v0.8.20 \
+  0xYourContractAddress \
+  src/intent.sol:IntentContract \
+  --etherscan-api-key $CRONOSSCAN_API_KEY
+```
+
+### Check Verification Status
+
+Visit:
+- **Testnet:** https://testnet.cronoscan.com/address/YOUR_CONTRACT_ADDRESS
+- **Mainnet:** https://cronoscan.com/address/YOUR_CONTRACT_ADDRESS
+
+## 🔧 Interacting with Deployed Contracts
+
+### Using Cast
+
+```bash
+# Read from contract
+cast call 0xYOUR_CONTRACT_ADDRESS \
+  "getIntent(uint256)" 1 \
+  --rpc-url $CRONOS_TESTNET_RPC
+
+# Write to contract
+cast send 0xYOUR_CONTRACT_ADDRESS \
+  "createIntent(address,uint256,uint256)" \
+  0xRecipientAddress 1000000000000000000 86400 \
+  --private-key $PRIVATE_KEY \
+  --rpc-url $CRONOS_TESTNET_RPC
+```
+
+### Using Foundry Console
+
+```bash
+# Start Anvil (local testnet)
+anvil
+
+# In another terminal
+forge script script/Interact.s.sol --fork-url http://localhost:8545 --broadcast
+```
+
+## 📊 Gas Optimization
+
+### Test Gas Usage
+
+```bash
+forge test --gas-report
+```
+
+### Optimize Compilation
+
+Update `foundry.toml`:
+```toml
+[profile.default]
+optimizer = true
+optimizer_runs = 200
+
+[profile.production]
+optimizer = true
+optimizer_runs = 1000000
+```
+
+Build with optimization:
+```bash
+forge build --use production
+```
+
+## 🔐 Security
+
+### Run Slither Analysis
+
+```bash
+pip install slither-analyzer
+slither src/intent.sol
+```
+
+### Run Mythril
+
+```bash
+pip install mythril
+myth analyze src/intent.sol
+```
+
+### Best Practices
+
+- ✅ Always test on testnet first
+- ✅ Verify contracts on explorer
+- ✅ Use `.env` for private keys (never commit!)
+- ✅ Run security analyzers before mainnet
+- ✅ Implement access control
+- ✅ Add emergency pause functionality
+- ✅ Test all edge cases
+- ✅ Document all functions
+
+## 📖 Contract Documentation
+
+### IntentContract
+
+Main contract for storing and managing payment intents.
+
+**Key Functions:**
+
+```solidity
+// Create a new payment intent
+function createIntent(
+    address recipient,
+    uint256 amount,
+    uint256 frequency
+) external returns (uint256 intentId);
+
+// Execute an intent (called by agent)
+function executeIntent(uint256 intentId) external;
+
+// Cancel an intent
+function cancelIntent(uint256 intentId) external;
+
+// Get intent details
+function getIntent(uint256 intentId) external view returns (Intent memory);
+```
+
+**Events:**
+
+```solidity
+event IntentCreated(uint256 indexed intentId, address indexed creator, address indexed recipient);
+event IntentExecuted(uint256 indexed intentId, uint256 timestamp);
+event IntentCancelled(uint256 indexed intentId);
+```
+
+## 🌐 Network Information
+
+### Cronos Testnet
+
+- **Chain ID:** 338
+- **RPC URL:** https://evm-t3.cronos.org
+- **Explorer:** https://testnet.cronoscan.com
+- **Faucet:** https://cronos.org/faucet
+- **Symbol:** TCRO
+
+### Cronos Mainnet
+
+- **Chain ID:** 25
+- **RPC URL:** https://evm.cronos.org
+- **Explorer:** https://cronoscan.com
+- **Symbol:** CRO
+
+## 📚 Resources
+
+### Foundry Documentation
+- [Foundry Book](https://book.getfoundry.sh/)
+- [Forge Commands](https://book.getfoundry.sh/reference/forge/)
+- [Cast Commands](https://book.getfoundry.sh/reference/cast/)
+
+### Cronos Documentation
+- [Cronos Docs](https://docs.cronos.org)
+- [Smart Contract Development](https://docs.cronos.org/for-dapp-developers/smart-contracts)
+- [x402 Protocol](https://docs.cronos.org/cronos-x402-facilitator)
+
+### Security Tools
+- [Slither](https://github.com/crytic/slither)
+- [Mythril](https://github.com/ConsenSys/mythril)
+- [OpenZeppelin Contracts](https://github.com/OpenZeppelin/openzeppelin-contracts)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch
+3. Write tests for new functionality
+4. Ensure all tests pass
+5. Submit a pull request
+
+## 📄 License
+
+MIT License - see LICENSE file for details
+
+---
+
+## 🎯 Project Alignment
+
+### Main Track: Agent-Triggered On-Chain Actions
+
+FlowPay demonstrates:
+- **Intent → Agent → Settlement Flow**
+- **Adaptive Decision-Making** (not rigid automation)
+- **x402 Integration** for programmatic payments
+- **Consumer-Facing Use Cases** (rent, subscriptions, allowances)
+- **Transparency** in agent reasoning
+
+### Key Features
+
+1. **Intent Creation**
+   - Users define payment intents with constraints
+   - High-level financial expressions
+
+2. **Agentic Decision Layer**
+   - Lightweight agent evaluates conditions
+   - Checks balance thresholds and safety buffers
+
+3. **Conditional Execution**
+   - Payments delayed if constraints violated
+   - Adaptive to user's financial context
+
+4. **x402 Settlement**
+   - Approved payments via x402 flows
+   - No repeated user signatures
+
+5. **Explainability**
+   - UI shows agent decision state
+   - Clear reasoning for actions
+
+### MVP Demo Flow
+
+1. User creates intent: "Pay 100 USDC rent monthly, keep 300 USDC buffer"
+2. Agent monitors wallet state
+3. Decision: Delay if balance too low
+4. Execution: Trigger x402 settlement when safe
+5. On-chain confirmation on Cronos
+
+---
+
+**Built for Cronos Hackathon** 🚀

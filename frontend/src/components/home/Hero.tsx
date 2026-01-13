@@ -1,8 +1,29 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Shield, Zap, Bot } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAccount } from "wagmi";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 
 const Hero = () => {
+  const { isConnected } = useAccount();
+  const { openConnectModal } = useConnectModal();
+  const navigate = useNavigate();
+
+  const handleLaunchApp = () => {
+    if (isConnected) {
+      navigate("/dashboard");
+    } else if (openConnectModal) {
+      openConnectModal();
+    }
+  };
+
+  const handleCreateIntent = () => {
+    if (isConnected) {
+      navigate("/create");
+    } else if (openConnectModal) {
+      openConnectModal();
+    }
+  };
   return (
     <section className="relative min-h-screen gradient-hero overflow-hidden">
       {/* Wavy Background SVG */}
@@ -91,17 +112,23 @@ const Hero = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-            <Link to="/dashboard">
-              <Button variant="gradient" size="xl" className="w-full sm:w-auto hover:scale-105 transition-transform">
-                Launch App
-                <ArrowRight className="w-5 h-5" />
-              </Button>
-            </Link>
-            <Link to="/create">
-              <Button variant="glass" size="xl" className="w-full sm:w-auto text-primary-foreground border-primary-foreground/20 hover:bg-primary-foreground/10 hover:scale-105 transition-transform">
-                Create Intent
-              </Button>
-            </Link>
+            <Button 
+              variant="gradient" 
+              size="xl" 
+              className="w-full sm:w-auto hover:scale-105 transition-transform"
+              onClick={handleLaunchApp}
+            >
+              Launch App
+              <ArrowRight className="w-5 h-5" />
+            </Button>
+            <Button 
+              variant="glass" 
+              size="xl" 
+              className="w-full sm:w-auto text-primary-foreground border-primary-foreground/20 hover:bg-primary-foreground/10 hover:scale-105 transition-transform"
+              onClick={handleCreateIntent}
+            >
+              Create Intent
+            </Button>
           </div>
 
           {/* Feature Cards */}

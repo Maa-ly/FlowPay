@@ -3,9 +3,22 @@ import Hero from "@/components/home/Hero";
 import HowItWorks from "@/components/home/HowItWorks";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Github, Twitter } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAccount } from "wagmi";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 
 const Index = () => {
+  const { isConnected } = useAccount();
+  const { openConnectModal } = useConnectModal();
+  const navigate = useNavigate();
+
+  const handleGetStarted = () => {
+    if (isConnected) {
+      navigate("/create");
+    } else if (openConnectModal) {
+      openConnectModal();
+    }
+  };
   return (
     <div className="min-h-screen">
       <Header />
@@ -21,12 +34,15 @@ const Index = () => {
           <p className="text-muted-foreground text-lg max-w-xl mx-auto mb-10">
             Start creating intent-driven payments today and let intelligent agents handle your recurring transactions.
           </p>
-          <Link to="/create">
-            <Button variant="gradient" size="xl" className="hover:scale-105 transition-transform">
-              Get Started
-              <ArrowRight className="w-5 h-5" />
-            </Button>
-          </Link>
+          <Button 
+            variant="gradient" 
+            size="xl" 
+            className="hover:scale-105 transition-transform"
+            onClick={handleGetStarted}
+          >
+            Get Started
+            <ArrowRight className="w-5 h-5" />
+          </Button>
         </div>
       </section>
 

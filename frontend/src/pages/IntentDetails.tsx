@@ -2,34 +2,18 @@ import Header from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import DeleteIntentModal from "@/components/dashboard/DeleteIntentModal";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
+import { EditIntentModal } from "@/components/dashboard/EditIntentModal";
 import { ArrowLeft, ArrowUpRight, Clock, CheckCircle2, AlertCircle, Pause, Play, Calendar, Shield, Wallet, History, Pencil, Trash2 } from "lucide-react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { PaymentIntent } from "@/components/dashboard/IntentCard";
 import { useState } from "react";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 const mockIntents: PaymentIntent[] = [
   {
     id: "1",
+    name: "Weekly Groceries",
     recipient: "0x1234...5678",
     amount: 100,
     token: "USDC",
@@ -40,6 +24,7 @@ const mockIntents: PaymentIntent[] = [
   },
   {
     id: "2",
+    name: "Weekly Allowance",
     recipient: "0xabcd...efgh",
     amount: 50,
     token: "USDC",
@@ -50,6 +35,7 @@ const mockIntents: PaymentIntent[] = [
   },
   {
     id: "3",
+    name: "Monthly Rent",
     recipient: "0x9876...5432",
     amount: 500,
     token: "USDC",
@@ -60,6 +46,7 @@ const mockIntents: PaymentIntent[] = [
   },
   {
     id: "4",
+    name: "Contractor Payment",
     recipient: "0xdef0...1234",
     amount: 25,
     token: "CRO",
@@ -82,13 +69,6 @@ const IntentDetails = () => {
   const [intentData, setIntentData] = useState(() => mockIntents.find((i) => i.id === id));
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editForm, setEditForm] = useState({
-    recipient: intentData?.recipient || "",
-    amount: intentData?.amount || 0,
-    token: intentData?.token || "USDC",
-    frequency: intentData?.frequency || "Monthly",
-    safetyBuffer: intentData?.safetyBuffer || 100,
-  });
 
   if (!intentData) {
     return (
@@ -138,32 +118,27 @@ const IntentDetails = () => {
   const handlePauseResume = () => {
     const newStatus = intentData.status === "paused" ? "ready" : "paused";
     setIntentData({ ...intentData, status: newStatus });
-    toast({
-      title: newStatus === "paused" ? "Intent Paused" : "Intent Resumed",
-      description: newStatus === "paused" 
-        ? "This intent will not execute until resumed." 
-        : "This intent is now active and will execute when conditions are met.",
-    });
+    toast.success(
+      newStatus === "paused" ? "Intent Paused" : "Intent Resumed",
+      {
+        description: newStatus === "paused" 
+          ? "This intent will not execute until resumed." 
+          : "This intent is now active and will execute when conditions are met.",
+      }
+    );
   };
 
   const handleDelete = () => {
     setIsDeleteModalOpen(false);
-    toast({
-      title: "Intent Deleted",
+    toast.success("Intent Deleted", {
       description: "The payment intent has been permanently deleted.",
-      variant: "destructive",
     });
     navigate("/dashboard");
   };
 
-  const handleEditSave = () => {
-    setIntentData({
-      ...intentData,
-      ...editForm,
-    });
-    setIsEditModalOpen(false);
-    toast({
-      title: "Intent Updated",
+  const handleEditSave = (updatedIntent: PaymentIntent) => {
+    setIntentData(updatedIntent);
+    toast.success("Intent Updated", {
       description: "Your payment intent has been successfully updated.",
     });
   };
@@ -186,11 +161,14 @@ const IntentDetails = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 animate-fade-in">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
-              <span className="font-mono text-xl font-bold text-primary">{intentData.token}</span>
+            <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center self-start">
+              <span className="font-mono text-2xl font-bold text-primary">{intentData.token}</span>
             </div>
             <div>
-              <h1 className="font-display text-3xl font-bold mb-1">
+              {intentData.name && (
+                <p className="text-lg font-semibold text-foreground mb-1">{intentData.name}</p>
+              )}
+              <h1 className={`font-display font-bold ${intentData.name ? 'text-2xl mb-1' : 'text-3xl mb-1'}`}>
                 {intentData.amount} {intentData.token}
               </h1>
               <p className="text-muted-foreground font-mono">{intentData.recipient}</p>
@@ -360,91 +338,12 @@ const IntentDetails = () => {
       />
 
       {/* Edit Modal */}
-      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Pencil className="w-5 h-5 text-primary" />
-              Edit Intent
-            </DialogTitle>
-            <DialogDescription>
-              Modify your payment intent details below.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="edit-recipient">Recipient Address</Label>
-              <Input
-                id="edit-recipient"
-                value={editForm.recipient}
-                onChange={(e) => setEditForm({ ...editForm, recipient: e.target.value })}
-                placeholder="0x..."
-                className="font-mono"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="edit-amount">Amount</Label>
-                <Input
-                  id="edit-amount"
-                  type="number"
-                  value={editForm.amount}
-                  onChange={(e) => setEditForm({ ...editForm, amount: Number(e.target.value) })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-token">Token</Label>
-                <Select value={editForm.token} onValueChange={(value) => setEditForm({ ...editForm, token: value })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="USDC">USDC</SelectItem>
-                    <SelectItem value="CRO">CRO</SelectItem>
-                    <SelectItem value="USDT">USDT</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-frequency">Frequency</Label>
-              <Select value={editForm.frequency} onValueChange={(value) => setEditForm({ ...editForm, frequency: value })}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Daily">Daily</SelectItem>
-                  <SelectItem value="Weekly">Weekly</SelectItem>
-                  <SelectItem value="Bi-weekly">Bi-weekly</SelectItem>
-                  <SelectItem value="Monthly">Monthly</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <Label>Safety Buffer</Label>
-                <span className="text-sm font-mono text-muted-foreground">{editForm.safetyBuffer} {editForm.token}</span>
-              </div>
-              <Slider
-                value={[editForm.safetyBuffer]}
-                onValueChange={(value) => setEditForm({ ...editForm, safetyBuffer: value[0] })}
-                max={1000}
-                min={0}
-                step={10}
-              />
-            </div>
-          </div>
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button variant="gradient" onClick={handleEditSave}>
-              <CheckCircle2 className="w-4 h-4" />
-              Save Changes
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <EditIntentModal
+        open={isEditModalOpen}
+        onOpenChange={setIsEditModalOpen}
+        intent={intentData}
+        onSave={handleEditSave}
+      />
     </div>
   );
 };

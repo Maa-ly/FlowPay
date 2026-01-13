@@ -11,9 +11,11 @@ import {
 import { MoreHorizontal, ArrowUpRight, Clock, CheckCircle2, AlertCircle, Pause, Eye, Edit, Trash2, PlayCircle, PauseCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { useState } from "react";
 
 export interface PaymentIntent {
   id: string;
+  name?: string;
   recipient: string;
   amount: number;
   token: string;
@@ -22,6 +24,12 @@ export interface PaymentIntent {
   status: "ready" | "delayed" | "executed" | "paused";
   nextExecution?: string;
   reason?: string;
+}
+
+interface IntentCardProps {
+  intent: PaymentIntent;
+  onEdit?: (intent: PaymentIntent) => void;
+  onDelete?: (intent: PaymentIntent) => void;
 }
 
 const statusConfig = {
@@ -47,8 +55,9 @@ const statusConfig = {
   },
 };
 
-const IntentCard = ({ intent }: { intent: PaymentIntent }) => {
-  const status = statusConfig[intent.status];
+const IntentCard = ({ intent, onEdit, onDelete }: IntentCardProps) => {
+  const [intentStatus, setIntentStatus] = useState(intent.status);
+  const status = statusConfig[intentStatus];
   const navigate = useNavigate();
 
   const handleView = () => {
@@ -57,21 +66,31 @@ const IntentCard = ({ intent }: { intent: PaymentIntent }) => {
 
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
-    toast.info("Edit functionality coming soon!");
+    if (onEdit) {
+      onEdit({ ...intent, status: intentStatus });
+    }
   };
 
   const handlePauseResume = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (intent.status === "paused") {
-      toast.success("Intent resumed successfully!");
-    } else {
-      toast.success("Intent paused successfully!");
-    }
+    const newStatus = intentStatus === "paused" ? "ready" : "paused";
+    setIntentStatus(newStatus);
+    
+    toast.success(
+      newStatus === "paused" ? "Intent Paused" : "Intent Resumed",
+      {
+        description: newStatus === "paused"
+          ? "This intent will not execute until resumed."
+          : "This intent is now active and will execute when conditions are met.",
+      }
+    );
   };
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
-    toast.error("Intent deleted!");
+    if (onDelete) {
+      onDelete({ ...intent, status: intentStatus });
+    }
   };
 
   return (
@@ -81,11 +100,14 @@ const IntentCard = ({ intent }: { intent: PaymentIntent }) => {
     >
       <CardHeader className="flex flex-row items-start justify-between pb-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-            <span className="font-mono text-sm font-semibold text-primary">{intent.token}</span>
+          <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center group-hover:scale-110 transition-transform self-start">
+            <span className="font-mono text-base font-semibold text-primary">{intent.token}</span>
           </div>
           <div>
-            <p className="font-semibold text-lg">{intent.amount} {intent.token}</p>
+            {intent.name && (
+              <p className="font-semibold text-base text-foreground mb-0.5">{intent.name}</p>
+            )}
+            <p className={`font-semibold ${intent.name ? 'text-sm' : 'text-lg'}`}>{intent.amount} {intent.token}</p>
             <p className="text-sm text-muted-foreground font-mono truncate max-w-[160px]">
               {intent.recipient}
             </p>
@@ -107,7 +129,7 @@ const IntentCard = ({ intent }: { intent: PaymentIntent }) => {
               Edit Intent
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handlePauseResume} className="cursor-pointer">
-              {intent.status === "paused" ? (
+              {intentStatus === "paused" ? (
                 <>
                   <PlayCircle className="w-4 h-4 mr-2" />
                   Resume Intent

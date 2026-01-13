@@ -6,6 +6,33 @@
 
 /* FlowPay Design System - Verdant Green Theme with glass morphism */
 
+/* Custom Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary));
+  border-radius: 10px;
+  border: 2px solid hsl(var(--muted));
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(152 76% 35%);
+}
+
+/* Firefox Scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--primary)) hsl(var(--muted));
+}
+
 @layer base {
   :root {
     --background: 140 20% 97%;
@@ -26,7 +53,7 @@
     --muted: 140 15% 92%;
     --muted-foreground: 150 15% 45%;
 
-    --accent: 120 60% 45%;
+    --accent: 152 76% 42%; /* Updated to match primary */
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 55%;
@@ -281,4 +308,32 @@
     stroke-dashoffset: -200;
     transform: translateX(50px);
   }
+}
+
+/* Sonner Toast Customization */
+[data-sonner-toast] {
+  background: white !important;
+  border: 1px solid hsl(var(--border)) !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15) !important;
+}
+
+[data-sonner-toast][data-type="success"] {
+  border-left: 4px solid hsl(var(--success)) !important;
+}
+
+[data-sonner-toast][data-type="error"] {
+  border-left: 4px solid hsl(var(--destructive)) !important;
+}
+
+[data-sonner-toast][data-type="warning"] {
+  border-left: 4px solid hsl(var(--warning)) !important;
+}
+
+[data-sonner-toast][data-type="info"] {
+  border-left: 4px solid hsl(var(--primary)) !important;
+}
+
+.dark [data-sonner-toast] {
+  background: hsl(var(--card)) !important;
+  border-color: hsl(var(--border)) !important;
 }
