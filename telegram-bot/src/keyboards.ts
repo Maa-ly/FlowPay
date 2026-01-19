@@ -40,10 +40,10 @@ export const dashboardKeyboard = () => {
 
 export const helpKeyboard = () => {
   return new InlineKeyboard()
-    .url('📖 Documentation', 'https://github.com/your-repo/docs')
+    .url('📖 Documentation', 'https://github.com/Maa-ly/docs')
     .row()
-    .url('💬 Community', 'https://t.me/flowpay_community')
-    .url('🐛 Report Issue', 'https://github.com/your-repo/issues')
+    .text('💬 Community (Coming Soon)', 'community_soon')
+    .text('🐛 Report Issue', 'https://github.com/Maa-ly/issues')
     .row()
     .text('« Back to Menu', 'main_menu');
 };

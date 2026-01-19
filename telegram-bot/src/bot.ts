@@ -171,6 +171,25 @@ bot.callbackQuery('stats', async (ctx) => {
   );
 });
 
+// Community and feedback handlers
+bot.callbackQuery('community_soon', async (ctx) => {
+  await ctx.answerCallbackQuery({
+    text: '💬 Community features coming soon! Join our updates channel.',
+    show_alert: true,
+  });
+});
+
+bot.callbackQuery('report_issue', async (ctx) => {
+  await ctx.answerCallbackQuery();
+  await ctx.reply(
+    '🐛 *Report an Issue*\n\nFound a bug or have feedback?\n\n*How to report:*\n1. Describe the issue clearly\n2. Include steps to reproduce\n3. Add screenshots if possible\n\n*Contact:*\n• Email: support@flowpay.io\n• GitHub: Coming soon\n• Telegram: @flowpay_support\n\nThank you for helping us improve! 💚',
+    { 
+      parse_mode: 'Markdown',
+      reply_markup: helpKeyboard()
+    }
+  );
+});
+
 // Handle all other messages
 bot.on('message:text', async (ctx) => {
   await ctx.reply(

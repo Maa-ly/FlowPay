@@ -358,7 +358,7 @@ Popular regions:
 - Share feedback
 
 **Option 3: Documentation**
-- Full docs: [GitHub Docs](https://github.com/your-repo/docs)
+- Full docs: [GitHub Docs](https://github.com/Maa-ly/docs)
 - API reference
 - Video tutorials
 
@@ -559,7 +559,7 @@ https://flowpayment.vercel.app/create?
 |------|-----|
 | **Web App** | https://flowpayment.vercel.app |
 | **Bot** | https://t.me/flowpayment_bot |
-| **Docs** | https://github.com/your-repo |
+| **Docs** | https://github.com/Maa-ly |
 | **Support** | https://t.me/flowpay_support |
 
 ---

@@ -349,7 +349,7 @@ We welcome improvements!
 
 ### Code Examples
 
-- GitHub: https://github.com/your-repo
+- GitHub: https://github.com/Maa-ly
 - Demos: https://flowpay.io/demos
 - Templates: https://flowpay.io/templates
 

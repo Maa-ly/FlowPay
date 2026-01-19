@@ -20,20 +20,4 @@ export const wagmiConfig = getDefaultConfig({
   projectId,
   chains: [cronosTestnet, cronosMainnet],
   ssr: false, // We're using Vite, not Next.js SSR
-  // Enable Telegram Web App support
-  walletConnectOptions: {
-    metadata: {
-      name: 'FlowPay',
-      description: 'Automate payments on Cronos blockchain',
-      url: 'https://flowpayment.vercel.app',
-      icons: ['https://flowpayment.vercel.app/flowpay-icon.svg'],
-    },
-    // Enable mobile linking for Telegram
-    qrModalOptions: {
-      themeMode: 'light',
-      themeVariables: {
-        '--wcm-z-index': '999999',
-      },
-    },
-  },
 });
