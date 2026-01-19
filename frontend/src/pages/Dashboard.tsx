@@ -7,9 +7,11 @@ import TransactionHistory from "@/components/dashboard/TransactionHistory";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, SlidersHorizontal, Target, History } from "lucide-react";
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { Link, Navigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { useAccount } from "wagmi";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -69,12 +71,18 @@ const mockIntents: PaymentIntent[] = [
 type FilterOption = "all" | "ready" | "delayed" | "executed" | "paused";
 
 const Dashboard = () => {
+  const { isConnected } = useAccount();
   const [filter, setFilter] = useState<FilterOption>("all");
   const [intents, setIntents] = useState<PaymentIntent[]>(mockIntents);
   const [intentToEdit, setIntentToEdit] = useState<PaymentIntent | null>(null);
   const [intentToDelete, setIntentToDelete] = useState<PaymentIntent | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  // Redirect to home if not connected
+  if (!isConnected) {
+    return <Navigate to="/" replace />;
+  }
 
   const filteredIntents = filter === "all" 
     ? intents 

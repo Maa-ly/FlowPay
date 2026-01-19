@@ -1,0 +1,30 @@
+{
+  "name": "flowpay-telegram-bot",
+  "version": "1.0.0",
+  "description": "FlowPay Telegram Bot for intent-driven payments on Cronos",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "deploy": "vercel --prod"
+  },
+  "keywords": ["telegram", "bot", "cronos", "payments", "web3"],
+  "author": "FlowPay",
+  "license": "MIT",
+  "dependencies": {
+    "grammy": "^1.30.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.10.6",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

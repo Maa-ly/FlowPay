@@ -216,7 +216,7 @@ function NetworkInfo() {
 
 ```tsx
 import { useWallet } from '@/contexts/WalletContext';
-import { formatCroAmount } from '@/lib/cronos-config';
+import { formatFlowPayount } from '@/lib/cronos-config';
 
 function BalanceDisplay() {
   const { balance, isConnected } = useWallet();
@@ -227,7 +227,7 @@ function BalanceDisplay() {
 
   return (
     <div>
-      <p>Balance: {formatCroAmount(balance, 4)} CRO</p>
+      <p>Balance: {formatFlowPayount(balance, 4)} CRO</p>
     </div>
   );
 }

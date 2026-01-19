@@ -31,8 +31,8 @@ Instead of relying on rigid schedules, FlowPay introduces a lightweight AI-drive
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/croam.git
-cd croam
+git clone https://github.com/Maa-ly/FlowPay.git
+cd FlowPay
 ```
 
 2. Install frontend dependencies:
@@ -47,7 +47,83 @@ cd ../contract
 forge install
 ```
 
+4. Install Telegram bot dependencies:
+```bash
+cd ../telegram-bot
+npm install
+```
+
 ### Running the Application
+
+#### Option 1: Web App Only
+
+1. Start the frontend:
+```bash
+cd frontend
+npm run dev
+```
+Access at: http://localhost:8080
+
+#### Option 2: Full Telegram Experience (Recommended)
+
+1. Start the bot backend:
+```bash
+cd telegram-bot
+npm run dev
+```
+
+2. Start the frontend (in another terminal):
+```bash
+cd frontend
+npm run dev
+```
+
+3. Open Telegram and search: `@flowpayment_bot`
+4. Send `/start` and tap "🚀 Open FlowPay App"
+
+---
+
+## 📚 Documentation
+
+All documentation is now in the [`/docs`](docs/) folder:
+
+### Quick Start Guides
+- **[⚡ BotFather Setup](docs/BOTFATHER_SETUP.md)** - Configure bot in 3 minutes ⭐ START HERE
+- **[🚀 Quick Start](docs/QUICK_START.md)** - Get started in 5 minutes
+- **[📱 User Guide](docs/USER_GUIDE.md)** - Complete user manual
+
+### Integration Guides
+- **[🤖 Telegram Implementation](docs/TELEGRAM_IMPLEMENTATION.md)** - Bot backend technical guide
+- **[🎨 Mini App Setup](docs/MINI_APP_SETUP.md)** - Configure Telegram Web App
+- **[💰 Chimoney Integration](docs/CHIMONEY_IMPLEMENTATION.md)** - Off-ramping to banks/mobile money
+- **[👛 Wallet Integration](docs/WALLET_INTEGRATION.md)** - Connect Web3 wallets
+
+### Deployment & Configuration
+- **[🚀 Bot Deployment](docs/BOT_IMAGE_AND_DEPLOYMENT.md)** - Deploy bot to production
+- **[🌈 RainbowKit Integration](docs/RAINBOWKIT_INTEGRATION.md)** - Wallet UI setup
+- **[🔧 WalletConnect FAQ](docs/WALLETCONNECT_FAQ.md)** - Troubleshooting
+
+### Technical References
+- **[📖 Documentation Index](docs/README.md)** - Full docs navigation
+- **[🏗️ Project Overview](docs/Project-overview.md)** - Architecture & structure
+- **[🔬 Technical Docs](docs/Docs.md)** - Complete tech specs
+
+---
+
+## 🎯 What's New
+
+### ✨ Latest Features
+- **Telegram Bot & Mini App** - Full chat interface with embedded web app
+- **AI-Powered Conditions** - Natural language payment triggers
+- **Off-Ramping** - Send crypto to bank accounts via Chimoney
+- **Multi-Wallet Support** - RainbowKit integration with 100+ wallets
+- **Payment Templates** - Pre-built intent templates for common use cases
+
+See [NEW_FEATURES.md](docs/NEW_FEATURES.md) for details.
+
+---
+
+## Running the Application
 
 #### Frontend Development Server
 
@@ -56,7 +132,7 @@ cd frontend
 npm run dev
 ```
 
-The application will be available at `http://localhost:5173`
+The application will be available at `http://localhost:8080`
 
 #### Smart Contract Development
 
@@ -151,7 +227,7 @@ The wallet integration uses modern Web3 libraries:
 ## 🏗️ Project Structure
 
 ```
-croam/
+FlowPay/
 ├── frontend/               # React + TypeScript frontend
 │   ├── src/
 │   │   ├── components/    # Reusable UI components

@@ -6,6 +6,7 @@ import { WagmiProvider } from "wagmi";
 import { RainbowKitProvider, lightTheme } from "@rainbow-me/rainbowkit";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { wagmiConfig } from "./config/wagmi";
+import { TelegramProvider } from "./contexts/TelegramContext";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import CreateIntent from "./pages/CreateIntent";
@@ -28,20 +29,22 @@ const App = () => (
           fontStack: 'system',
         })}
       >
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/create" element={<CreateIntent />} />
-              <Route path="/intent/:id" element={<IntentDetails />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
+        <TelegramProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/create" element={<CreateIntent />} />
+                <Route path="/intent/:id" element={<IntentDetails />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </TelegramProvider>
       </RainbowKitProvider>
     </QueryClientProvider>
   </WagmiProvider>
