@@ -6,4 +6,9 @@ libs = ["lib"]
 
 remappings =['@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/']
 
+
+[rpc_endpoints]
+localchain = "${LOCALCHAIN_URL}"
+basechain = "${CRONOS_URL}"
+
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

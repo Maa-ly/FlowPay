@@ -11,6 +11,7 @@ struct PaymentIntent {
    uint256 interval;      // execution interval in seconds
    uint256 lastExecuted;  // timestamp of last execution
    bool active;
+   // frequency ?
 }
 
 
@@ -80,22 +81,30 @@ contract Intent {
 
 
 
-    function executeIntent(uint256 intentId) public {
-        PaymentIntent storage paymentIntent = intents[intentId];
-        require(paymentIntent.active, "Intent is not active");
-        require(block.timestamp >= paymentIntent.lastExecuted + paymentIntent.interval, "Interval not reached");
+//x402 calls
 
-         // pay recipient logic , question is how to handle the funds?
-         // the reciepient could be something else than an EOA, could be a user without EOA
-         // eg rent , phone bill, subscription etc.
-         // for now we just update the last executed timestamp
-         // talk to teammates about this part
+    // function executeIntent(uint256 intentId) public {
+    //     PaymentIntent storage paymentIntent = intents[intentId];
+    //     require(paymentIntent.active, "Intent is not active");
+    //     require(block.timestamp >= paymentIntent.lastExecuted + paymentIntent.interval, "Interval not reached");
+    //     // check threshold balance
 
-         // so we can setup an escrow contract to hold the funds and pay out when executed
-        paymentIntent.lastExecuted = block.timestamp;
-        paymentIntent.active = false; // deactivate after 
-        emit IntentExecuted(intentId, block.timestamp);
-    }
+    //     //
+    //      // usdc ----- eoa --- rent --- card -- an invoce? 
+    //      // user tryna send ton or make intent does does accept crpto or have eoa
+    //      // pay recipient logic , question is how to handle the funds?
+    //      // the reciepient could be something else than an EOA, could be a user without EOA
+    //      // eg rent , phone bill, subscription etc.
+    //      // for now we just update the last executed timestamp
+    //      // talk to teammates about this part
+    
+    //      // so we can setup an escrow contract to hold the funds and pay out when executed
+    //      // transfer funds to escrow contract
+    //      // call escrow release function to pay recipient
+    //     paymentIntent.lastExecuted = block.timestamp;
+    //     paymentIntent.active = false; // deactivate after 
+    //     emit IntentExecuted(intentId, block.timestamp);
+    // }
 
     function deactivateIntent(uint256 intentId) public {
         PaymentIntent storage paymentIntent = intents[intentId];
