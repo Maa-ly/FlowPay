@@ -85,19 +85,19 @@ const AdvancedConstraintsForm = ({ constraints, onConstraintsChange }: AdvancedC
   return (
     <Card className="border-primary/20">
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex-1">
+            <CardTitle className="flex items-center gap-2 flex-wrap">
               <Zap className="w-5 h-5 text-primary" />
-              Advanced Constraints
-              <Badge variant="outline" className="ml-2">
-                {activeConstraintsCount} Active
-              </Badge>
+              <span>Advanced Constraints</span>
             </CardTitle>
             <CardDescription className="mt-1">
               Fine-tune when and how your payment intent executes
             </CardDescription>
           </div>
+          <Badge variant="outline" className="self-start sm:self-center">
+            {activeConstraintsCount} Active
+          </Badge>
         </div>
       </CardHeader>
 

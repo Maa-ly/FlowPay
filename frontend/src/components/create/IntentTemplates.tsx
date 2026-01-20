@@ -125,6 +125,10 @@ const IntentTemplates = ({ onSelectTemplate }: IntentTemplatesProps) => {
     }
   };
 
+  const formatCategoryLabel = (category: IntentTemplate["category"]) => {
+    return category.charAt(0).toUpperCase() + category.slice(1);
+  };
+
   return (
     <div className="space-y-6">
       <div className="text-center max-w-2xl mx-auto">
@@ -154,13 +158,13 @@ const IntentTemplates = ({ onSelectTemplate }: IntentTemplatesProps) => {
 
             <CardHeader>
               <div className="flex items-start gap-3 mb-3">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
                   {template.icon}
                 </div>
                 <div className="flex-1">
                   <CardTitle className="text-lg mb-1">{template.name}</CardTitle>
                   <Badge variant="outline" className={getCategoryColor(template.category)}>
-                    {template.category.charAt(0).toUpperCase() + template.category.slice(1)}
+                    {formatCategoryLabel(template.category)}
                   </Badge>
                 </div>
               </div>

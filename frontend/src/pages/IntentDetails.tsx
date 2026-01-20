@@ -330,6 +330,7 @@ const IntentDetails = () => {
         onOpenChange={setIsDeleteModalOpen}
         onDelete={handleDelete}
         intentData={{
+          name: intentData.name,
           amount: intentData.amount,
           token: intentData.token,
           recipient: intentData.recipient,

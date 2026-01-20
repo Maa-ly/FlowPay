@@ -181,8 +181,8 @@ bot.callbackQuery('community_soon', async (ctx) => {
 
 bot.callbackQuery('report_issue', async (ctx) => {
   await ctx.answerCallbackQuery();
-  await ctx.reply(
-    '🐛 *Report an Issue*\n\nFound a bug or have feedback?\n\n*How to report:*\n1. Describe the issue clearly\n2. Include steps to reproduce\n3. Add screenshots if possible\n\n*Contact:*\n• Email: support@flowpay.io\n• GitHub: Coming soon\n• Telegram: @flowpay_support\n\nThank you for helping us improve! 💚',
+  await ctx.editMessageText(
+    '🐛 *Report an Issue*\n\nFound a bug or have feedback?\n\n*How to report:*\n1. Describe the issue clearly\n2. Include steps to reproduce\n3. Add screenshots if possible\n\n*Contact Methods:*\n• GitHub: Coming soon\n• Email: support@flowpay.io\n• Telegram: @flowpay_support\n\nFor urgent issues, please use the email option.\n\nThank you for helping us improve! 💚',
     { 
       parse_mode: 'Markdown',
       reply_markup: helpKeyboard()

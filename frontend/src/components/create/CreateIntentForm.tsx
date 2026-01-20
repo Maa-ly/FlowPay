@@ -75,7 +75,7 @@ const CreateIntentForm = ({ selectedTemplate }: CreateIntentFormProps) => {
                 <p className="text-sm text-muted-foreground">{selectedTemplate.description}</p>
               </div>
               <Badge variant="outline" className="bg-background">
-                {selectedTemplate.category}
+                {selectedTemplate.category.charAt(0).toUpperCase() + selectedTemplate.category.slice(1)}
               </Badge>
             </div>
           </CardContent>

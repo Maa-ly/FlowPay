@@ -28,6 +28,18 @@ const App = () => (
           borderRadius: 'medium',
           fontStack: 'system',
         })}
+        modalSize="compact"
+        appInfo={{
+          appName: 'FlowPay',
+          learnMoreUrl: 'https://flowpayment.vercel.app',
+          disclaimer: ({ Text, Link }) => (
+            <Text>
+              💡 <strong>Mobile Users:</strong> If MetaMask shows an error, use the{' '}
+              <strong>"WalletConnect"</strong> option and scan the QR code with your MetaMask mobile app.
+              {' '}Other wallets like Rainbow and Base work seamlessly.
+            </Text>
+          ),
+        }}
       >
         <TelegramProvider>
           <TooltipProvider>
