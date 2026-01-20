@@ -20,6 +20,7 @@ struct PaymentIntent {
 contract Intent {
  
     address public owner;
+    address public controller_;
     address public escrowImpl;
     bool public initialized;
 
@@ -44,6 +45,10 @@ contract Intent {
         require(msg.sender == owner, "Not owner");
         _;
     }
+    modifier onlyController() {
+        require(msg.sender == controller_, "Not controller");
+        _;
+    }   
 
     function initialize(address _owner, address _escrowImpl) external {
         require(!initialized, "Already initialized");
@@ -105,6 +110,22 @@ contract Intent {
     //     paymentIntent.active = false; // deactivate after 
     //     emit IntentExecuted(intentId, block.timestamp);
     // }
+
+    // removed the line above as facilitator handles that offchain, best dealis to mark as executed
+    // and let facilitator handle the payment logic offchain
+    // only 0402 can call this function
+    function markIntentExecuted(uint256 intentId) public onlyController{
+        PaymentIntent storage paymentIntent = intents[intentId];
+        require(paymentIntent.active, "Intent is not active");
+        require(block.timestamp >= paymentIntent.lastExecuted + paymentIntent.interval, "Interval not reached");
+
+        paymentIntent.lastExecuted = block.timestamp;
+        emit IntentExecuted(intentId, block.timestamp);
+    }
+
+    function setController(address _controller) public onlyOwner {
+        controller_ = _controller;
+    }
 
     function deactivateIntent(uint256 intentId) public {
         PaymentIntent storage paymentIntent = intents[intentId];
