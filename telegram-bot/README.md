@@ -33,9 +33,9 @@ The bot will start in long polling mode and connect to Telegram.
 ## 📝 Environment Variables
 
 ```env
-BOT_TOKEN=8213507760:AAHgWNKq9qC23tSk_jJoAONH7EpeRZxS6GU
-BOT_USERNAME=flowpayment_bot
-ADMIN_USER_ID=646892793
+BOT_TOKEN=your_bot_token_here
+BOT_USERNAME=your_bot_username_here
+ADMIN_USER_ID=your_admin_user_id_here
 MINI_APP_URL=https://your-frontend.vercel.app
 PORT=3000
 NODE_ENV=development
@@ -79,7 +79,7 @@ npm run deploy
 
 4. **Set webhook:**
 ```bash
-curl "https://api.telegram.org/bot8213507760:AAHgWNKq9qC23tSk_jJoAONH7EpeRZxS6GU/setWebhook?url=https://your-bot.vercel.app/webhook"
+curl "https://api.telegram.org/bot<YOUR_BOT_TOKEN>/setWebhook?url=https://your-bot.vercel.app/webhook"
 ```
 
 ## 📚 Project Structure

@@ -204,9 +204,9 @@ You'll get a URL like: `https://flowpay-bot.vercel.app`
 
 In Vercel dashboard, add:
 ```env
-BOT_TOKEN=8213507760:AAHgWNKq9qC23tSk_jJoAONH7EpeRZxS6GU
-BOT_USERNAME=flowpayment_bot
-ADMIN_USER_ID=646892793
+BOT_TOKEN=your_bot_token_here
+BOT_USERNAME=your_bot_username_here
+ADMIN_USER_ID=your_admin_user_id_here
 MINI_APP_URL=https://flowpayment.vercel.app
 WEBHOOK_URL=https://flowpay-bot.vercel.app/webhook
 NODE_ENV=production
@@ -216,7 +216,7 @@ PORT=3000
 ### Step 4: Set Webhook
 
 ```bash
-curl "https://api.telegram.org/bot8213507760:AAHgWNKq9qC23tSk_jJoAONH7EpeRZxS6GU/setWebhook?url=https://flowpay-bot.vercel.app/webhook"
+curl "https://api.telegram.org/bot<YOUR_BOT_TOKEN>/setWebhook?url=https://flowpay-bot.vercel.app/webhook"
 ```
 
 **Response should be:**

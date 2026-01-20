@@ -160,10 +160,11 @@ Then click "Open FlowPay App" in the bot!
 ## 🎯 Your Bot Details
 
 **Bot Name:** FlowPay
-**Bot Username:** `@flowpayment_bot`
-**Bot Token:** `8213507760:AAHgWNKq9qC23tSk_jJoAONH7EpeRZxS6GU`
-**Admin User ID:** `646892793`
-**Admin Name:** Awe Joseph Olaitan
+
+**Bot Username:** `@your_bot_username_here`
+**Bot Token:** `your_bot_token_here`
+**Admin User ID:** `your_admin_user_id_here`
+**Admin Name:** <redacted>
 
 **Bot Link:** https://t.me/flowpayment_bot
 
@@ -207,9 +208,9 @@ Then click "Open FlowPay App" in the bot!
 ### Bot Environment (.env already configured)
 
 ```env
-BOT_TOKEN=8213507760:AAHgWNKq9qC23tSk_jJoAONH7EpeRZxS6GU
-BOT_USERNAME=flowpayment_bot
-ADMIN_USER_ID=646892793
+BOT_TOKEN=your_bot_token_here
+BOT_USERNAME=your_bot_username_here
+ADMIN_USER_ID=your_admin_user_id_here
 MINI_APP_URL=http://localhost:8080
 PORT=3000
 NODE_ENV=development

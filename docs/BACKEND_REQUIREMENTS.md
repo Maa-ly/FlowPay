@@ -407,7 +407,7 @@ JWT_SECRET=your_jwt_secret
 API_RATE_LIMIT=100
 
 # Telegram
-TELEGRAM_BOT_TOKEN=8213507760:AAHgWNKq9qC23tSk_jJoAONH7EpeRZxS6GU
+TELEGRAM_BOT_TOKEN=your_bot_token_here
 TELEGRAM_WEBHOOK_URL=https://api.flowpay.com/telegram/webhook
 
 # Notifications

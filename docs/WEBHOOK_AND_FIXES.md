@@ -25,7 +25,7 @@ npm run delete-webhook
 
 Or manually via curl:
 ```bash
-curl "https://api.telegram.org/bot8213507760:AAHgWNKq9qC23tSk_jJoAONH7EpeRZxS6GU/deleteWebhook"
+curl "https://api.telegram.org/bot<YOUR_BOT_TOKEN>/deleteWebhook"
 ```
 
 **Response should be:**
@@ -285,7 +285,7 @@ bot.callbackQuery('report_issue', async (ctx) => {
 ### Bot Webhook Issue:
 ```bash
 # Delete webhook
-curl "https://api.telegram.org/bot8213507760:AAHgWNKq9qC23tSk_jJoAONH7EpeRZxS6GU/deleteWebhook"
+curl "https://api.telegram.org/bot<YOUR_BOT_TOKEN>/deleteWebhook"
 
 # Then restart bot
 cd telegram-bot && npm run dev
