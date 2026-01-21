@@ -3,13 +3,11 @@ pragma solidity ^0.8.30;
 
 import {Test} from "lib/forge-std/src/Test.sol";
 import "../src/intent.sol";
-import "../src/escrow.sol";
 import "../src/factory.sol";
 import {console} from "lib/forge-std/src/console.sol";
 
 contract IntentTestBase is Test {
     Intent public intent;
-    Escrow public escrow;
     FactoryMech public factory;
 
     uint256 amount = 1 ether;
@@ -21,96 +19,66 @@ contract IntentTestBase is Test {
 
     function setUp() public {
         intent = new Intent();
-        escrow = new Escrow();
-        factory = new FactoryMech(address(intent), address(escrow));
+        factory = new FactoryMech(address(intent));
         deal(alice, 10 ether);
         deal(dave, 10 ether);
     }
 
-
     function cloneIntentForUser() public returns (address intentClone) {
         intentClone = factory.createIntentClone();
-       
+
         console.log("Intent Clone Address:", intentClone);
     }
 
-    function createIntent(address intent_, address recipient, uint256 amount, uint256 minBalance, uint256 interval) public returns (uint256) {
-
-      (bool ok, bytes memory data) = intent_.call(
+    function createIntent(address intent_, address recipient, uint256 amount, uint256 minBalance, uint256 interval)
+        public
+        returns (uint256)
+    {
+        (bool ok, bytes memory data) = intent_.call(
             abi.encodeWithSignature(
-                "createIntent(address,uint256,uint256,uint256)",
-                recipient,
-                amount,
-                minBalance,
-                interval
+                "createIntent(address,uint256,uint256,uint256)", recipient, amount, minBalance, interval
             )
         );
         require(ok, "Create Intent failed");
         uint256 intentId = abi.decode(data, (uint256));
 
-        return intentId; 
+        return intentId;
     }
 
     function getIntent(address intent_, uint256 intentId) public returns (PaymentIntent memory) {
-      (bool ok, bytes memory data) = intent_.call(
-            abi.encodeWithSignature(
-                "getIntent(uint256)",
-                intentId
-            )
-        );
+        (bool ok, bytes memory data) = intent_.call(abi.encodeWithSignature("getIntent(uint256)", intentId));
         require(ok, "Call failed");
         return abi.decode(data, (PaymentIntent));
     }
 
-    function isIntentActive(address intent_, uint256 intentId) public  returns (bool) {
-      (bool ok, bytes memory data)  = intent_.call(
-            abi.encodeWithSignature(
-                "getIntent(uint256)",
-                intentId
-            )
-        );
+    function isIntentActive(address intent_, uint256 intentId) public returns (bool) {
+        (bool ok, bytes memory data) = intent_.call(abi.encodeWithSignature("getIntent(uint256)", intentId));
         require(ok, "Call failed");
         PaymentIntent memory paymentIntent = abi.decode(data, (PaymentIntent));
         return paymentIntent.active;
     }
 
-
-
     function deactivateIntent(address intent_, uint256 intentId) public {
-       (bool ok, bytes memory data) =  intent_.call(abi.encodeWithSignature("deactivateIntent(uint256)", intentId));
-         require(ok, "Deactivate failed");
+        (bool ok, bytes memory data) = intent_.call(abi.encodeWithSignature("deactivateIntent(uint256)", intentId));
+        require(ok, "Deactivate failed");
         console.log("Intent Deactivated");
     }
-
 
     // function executeIntent(uint256 intentId) public {
     //     intent.executeIntent(intentId);
     //     console.log("Intent Executed");
     // }
 
-
-    function getUserCurrentIntents(address intent_, address user) public  returns (uint256[] memory) {
-     (bool ok, bytes memory data) = intent_.call(
-            abi.encodeWithSignature(
-                "getCurrentIntents(address)",
-                user
-            )
-        );
+    function getUserCurrentIntents(address intent_, address user) public returns (uint256[] memory) {
+        (bool ok, bytes memory data) = intent_.call(abi.encodeWithSignature("getCurrentIntents(address)", user));
         require(ok, "Call failed");
         return abi.decode(data, (uint256[]));
-
     }
 
-    function getUserOldIntents(address intent_, address user) public  returns (uint256[] memory) {
-          (bool ok, bytes memory data) = intent_.call(
-            abi.encodeWithSignature(
-                "getOldIntents(address)",
-                user
-            )
-        );
+    function getUserOldIntents(address intent_, address user) public returns (uint256[] memory) {
+        (bool ok, bytes memory data) = intent_.call(abi.encodeWithSignature("getOldIntents(address)", user));
         require(ok, "Call failed");
         return abi.decode(data, (uint256[]));
-
     }
 
     function test_CreateIntentClone() public {
@@ -118,7 +86,6 @@ contract IntentTestBase is Test {
         address intentClone = cloneIntentForUser();
         assertTrue(intentClone != address(0), "Intent clone address should not be zero");
     }
-
 
     function test_CanCreateIntentandactive() public {
         vm.startPrank(dave);
@@ -129,8 +96,8 @@ contract IntentTestBase is Test {
         bool data = isIntentActive(intentClone, id_a);
         PaymentIntent memory intentData = getIntent(intentClone, id_a);
         assertEq(intentData.owner, dave, "Owner should be Dave");
-        assertEq(intentData.recipient, alice, "Recipient should be Alice");   
-        assertEq(id_a,0, "Intent ID should be 0");
+        assertEq(intentData.recipient, alice, "Recipient should be Alice");
+        assertEq(id_a, 0, "Intent ID should be 0");
         assertTrue(data, "Intent should be active after creation");
     }
 
@@ -143,7 +110,7 @@ contract IntentTestBase is Test {
     //     bool foundInCurrent = false;
     //     for (uint256 i = 0; i < currentIntents.length; i++) {
     //         if (currentIntents[i] == id) {
-    //             foundInCurrent = true;      
+    //             foundInCurrent = true;
     //             break;
     //         }
     //     }
@@ -159,7 +126,7 @@ contract IntentTestBase is Test {
     //     for (uint256 i = 0; i < oldIntents.length; i++) {
     //         if (oldIntents[i] == id) {
     //             found = true;
-    //             break;         
+    //             break;
 
     //         }
     //     }
