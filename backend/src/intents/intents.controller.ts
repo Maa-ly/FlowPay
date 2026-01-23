@@ -42,6 +42,15 @@ export class IntentsController {
     return await this.intentsService.resumeIntent(id, req.user.userId);
   }
 
+  @Patch(":id")
+  async update(
+    @Param("id") id: string,
+    @Request() req,
+    @Body() data: Partial<CreateIntentDto>,
+  ) {
+    return await this.intentsService.updateIntent(id, req.user.userId, data);
+  }
+
   @Delete(":id")
   async delete(@Param("id") id: string, @Request() req) {
     return await this.intentsService.deleteIntent(id, req.user.userId);

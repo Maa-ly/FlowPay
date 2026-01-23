@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { BlockchainService } from "../blockchain/blockchain.service";
+import { NotificationsService } from "../notifications/notifications.service";
 
 export interface CreateIntentDto {
   name: string;
@@ -23,6 +24,7 @@ export class IntentsService {
   constructor(
     private prisma: PrismaService,
     private blockchainService: BlockchainService,
+    private notificationsService: NotificationsService,
   ) {}
 
   // Helper to serialize BigInt and Decimal for JSON
@@ -71,6 +73,19 @@ export class IntentsService {
       },
     });
 
+    // Send notification for intent creation
+    await this.notificationsService.sendNotification(userId, {
+      type: "INTENT_CREATED",
+      title: "Intent Created",
+      message: `New payment intent "${data.name || `${data.token} Payment`}" created successfully. Amount: ${data.amount} ${data.token}, Frequency: ${data.frequency}`,
+      data: {
+        intentId: intent.id,
+        amount: data.amount,
+        token: data.token,
+        frequency: data.frequency,
+      },
+    });
+
     // Convert BigInt fields to strings for JSON serialization
     return {
       ...intent,
@@ -108,6 +123,46 @@ export class IntentsService {
     const intent = await this.prisma.intent.update({
       where: { id, userId },
       data: { status: "ACTIVE" },
+    });
+    return this.serializeIntent(intent);
+  }
+
+  async updateIntent(
+    id: string,
+    userId: string,
+    data: Partial<CreateIntentDto>,
+  ) {
+    // Only update fields that are provided
+    const updateData: any = {};
+
+    if (data.name !== undefined) updateData.name = data.name;
+    if (data.description !== undefined)
+      updateData.description = data.description;
+    if (data.recipient !== undefined) updateData.recipient = data.recipient;
+    if (data.amount !== undefined) updateData.amount = data.amount.toString();
+    if (data.token !== undefined) updateData.token = data.token;
+    if (data.tokenAddress !== undefined)
+      updateData.tokenAddress = data.tokenAddress;
+    if (data.frequency !== undefined) {
+      updateData.frequency = data.frequency;
+      // Recalculate next execution if frequency changed
+      updateData.nextExecution = this.calculateNextExecution(data.frequency);
+    }
+    if (data.safetyBuffer !== undefined)
+      updateData.safetyBuffer = data.safetyBuffer.toString();
+    if (data.maxGasPrice !== undefined)
+      updateData.maxGasPrice = BigInt(Math.floor(data.maxGasPrice));
+    if (data.timeWindowStart !== undefined)
+      updateData.timeWindowStart = data.timeWindowStart;
+    if (data.timeWindowEnd !== undefined)
+      updateData.timeWindowEnd = data.timeWindowEnd;
+    if (data.isOffRamp !== undefined) updateData.isOffRamp = data.isOffRamp;
+    if (data.offRampDetails !== undefined)
+      updateData.offRampDetails = data.offRampDetails;
+
+    const intent = await this.prisma.intent.update({
+      where: { id, userId },
+      data: updateData,
     });
     return this.serializeIntent(intent);
   }

@@ -1,93 +1,167 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, ExternalLink, Clock, TrendingUp } from "lucide-react";
+import {
+  CheckCircle2,
+  ExternalLink,
+  Clock,
+  XCircle,
+  AlertCircle,
+} from "lucide-react";
 import { formatDistance } from "date-fns";
+import { useFlowPayAPI } from "@/hooks/useFlowPayAPI";
+import { useFlowPayAuth } from "@/hooks/useFlowPayAuth";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
+import { SpinnerLoader } from "@/components/ui/skeleton-loader";
+import { formatDateShort } from "@/lib/utils";
 
 export interface Transaction {
   id: string;
   intentId: string;
   intentName: string;
   recipient: string;
-  amount: number;
+  amount: string;
   token: string;
-  status: "completed" | "pending" | "failed";
-  timestamp: Date;
+  status: "SUCCESS" | "FAILED" | "PENDING";
+  timestamp: string;
   txHash?: string;
   gasUsed?: string;
+  errorMessage?: string;
 }
 
-const mockTransactions: Transaction[] = [
-  {
-    id: "tx1",
-    intentId: "3",
-    intentName: "Monthly Rent",
-    recipient: "0x9876...5432",
-    amount: 500,
-    token: "USDC",
-    status: "completed",
-    timestamp: new Date(Date.now() - 86400000 * 2), // 2 days ago
-    txHash: "0xabc123...def456",
-    gasUsed: "0.05",
-  },
-  {
-    id: "tx2",
-    intentId: "1",
-    intentName: "Weekly Groceries",
-    recipient: "0x1234...5678",
-    amount: 100,
-    token: "USDC",
-    status: "completed",
-    timestamp: new Date(Date.now() - 86400000 * 30), // 30 days ago
-    txHash: "0xdef789...abc123",
-    gasUsed: "0.03",
-  },
-  {
-    id: "tx3",
-    intentId: "2",
-    intentName: "Weekly Allowance",
-    recipient: "0xabcd...efgh",
-    amount: 50,
-    token: "USDC",
-    status: "completed",
-    timestamp: new Date(Date.now() - 86400000 * 7), // 7 days ago
-    txHash: "0x123abc...789def",
-    gasUsed: "0.04",
-  },
-  {
-    id: "tx4",
-    intentId: "4",
-    intentName: "Contractor Payment",
-    recipient: "0xdef0...1234",
-    amount: 25,
-    token: "CRO",
-    status: "completed",
-    timestamp: new Date(Date.now() - 86400000 * 14), // 14 days ago
-    txHash: "0x456def...123abc",
-    gasUsed: "0.02",
-  },
-];
-
 const TransactionHistory = () => {
+  const { listIntents } = useFlowPayAPI();
+  const { isAuthenticated } = useFlowPayAuth();
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadTransactions();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated]);
+
+  const loadTransactions = async () => {
+    try {
+      setLoading(true);
+      const intents = await listIntents();
+
+      // Extract all executions from all intents
+      const allExecutions: Transaction[] = [];
+      intents.forEach((intent) => {
+        if (intent.executions && intent.executions.length > 0) {
+          intent.executions.forEach((exec) => {
+            allExecutions.push({
+              id: exec.id,
+              intentId: intent.id,
+              intentName: intent.name || `${intent.token} Payment`,
+              recipient: intent.recipient,
+              amount: exec.amount,
+              token: intent.token,
+              status: exec.status as "SUCCESS" | "FAILED" | "PENDING",
+              timestamp: exec.executedAt,
+              txHash: exec.txHash,
+              gasUsed: exec.gasUsed,
+              errorMessage: exec.errorMessage,
+            });
+          });
+        }
+      });
+
+      // Sort by timestamp descending (most recent first)
+      allExecutions.sort(
+        (a, b) =>
+          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+      );
+
+      setTransactions(allExecutions);
+    } catch (error) {
+      const err = error as Error;
+      console.error("Failed to load transactions:", err);
+      toast.error("Failed to load transaction history", {
+        description: err.message || "Please try again later.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
   const getStatusBadge = (status: Transaction["status"]) => {
     switch (status) {
-      case "completed":
-        return <Badge variant="default" className="bg-success/10 text-success hover:bg-success/20">Completed</Badge>;
-      case "pending":
-        return <Badge variant="secondary">Pending</Badge>;
-      case "failed":
-        return <Badge variant="destructive">Failed</Badge>;
+      case "SUCCESS":
+        return (
+          <Badge
+            variant="default"
+            className="bg-success/10 text-success hover:bg-success/20 border-success/20"
+          >
+            <CheckCircle2 className="w-3 h-3 mr-1" />
+            Completed
+          </Badge>
+        );
+      case "PENDING":
+        return (
+          <Badge variant="secondary">
+            <Clock className="w-3 h-3 mr-1" />
+            Pending
+          </Badge>
+        );
+      case "FAILED":
+        return (
+          <Badge
+            variant="destructive"
+            className="bg-destructive/10 text-destructive hover:bg-destructive/20 border-destructive/20"
+          >
+            <XCircle className="w-3 h-3 mr-1" />
+            Failed
+          </Badge>
+        );
     }
   };
 
-  const totalVolume = mockTransactions
-    .filter(tx => tx.status === "completed")
-    .reduce((acc, tx) => acc + tx.amount, 0);
+  // Calculate stats from real transactions
+  const successfulTransactions = transactions.filter(
+    (tx) => tx.status === "SUCCESS",
+  );
 
-  const totalGasSpent = mockTransactions
-    .filter(tx => tx.gasUsed)
-    .reduce((acc, tx) => acc + parseFloat(tx.gasUsed || "0"), 0)
+  const totalVolume = successfulTransactions
+    .reduce((acc, tx) => acc + parseFloat(tx.amount || "0"), 0)
     .toFixed(2);
+
+  const totalGasSpent = successfulTransactions
+    .filter((tx) => tx.gasUsed)
+    .reduce((acc, tx) => acc + parseFloat(tx.gasUsed || "0"), 0)
+    .toFixed(4);
+
+  const getStatusIcon = (status: Transaction["status"]) => {
+    switch (status) {
+      case "SUCCESS":
+        return <CheckCircle2 className="w-5 h-5 text-success" />;
+      case "FAILED":
+        return <XCircle className="w-5 h-5 text-destructive" />;
+      case "PENDING":
+        return <Clock className="w-5 h-5 text-warning" />;
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center py-12">
+          <SpinnerLoader />
+          <p className="text-muted-foreground mt-4">
+            Loading transaction history...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -96,7 +170,7 @@ const TransactionHistory = () => {
         <Card>
           <CardHeader className="pb-3">
             <CardDescription>Total Transactions</CardDescription>
-            <CardTitle className="text-3xl">{mockTransactions.length}</CardTitle>
+            <CardTitle className="text-3xl">{transactions.length}</CardTitle>
           </CardHeader>
         </Card>
         <Card>
@@ -104,7 +178,9 @@ const TransactionHistory = () => {
             <CardDescription>Total Volume</CardDescription>
             <CardTitle className="text-3xl flex items-baseline gap-2">
               {totalVolume}
-              <span className="text-sm font-normal text-muted-foreground">USDC</span>
+              <span className="text-sm font-normal text-muted-foreground">
+                USDC
+              </span>
             </CardTitle>
           </CardHeader>
         </Card>
@@ -113,7 +189,9 @@ const TransactionHistory = () => {
             <CardDescription>Gas Spent</CardDescription>
             <CardTitle className="text-3xl flex items-baseline gap-2">
               {totalGasSpent}
-              <span className="text-sm font-normal text-muted-foreground">CRO</span>
+              <span className="text-sm font-normal text-muted-foreground">
+                CRO
+              </span>
             </CardTitle>
           </CardHeader>
         </Card>
@@ -123,58 +201,72 @@ const TransactionHistory = () => {
       <Card>
         <CardHeader>
           <CardTitle>Recent Transactions</CardTitle>
-          <CardDescription>View your payment intent execution history</CardDescription>
+          <CardDescription>
+            View your payment intent execution history
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          {mockTransactions.length === 0 ? (
+          {transactions.length === 0 ? (
             <div className="py-12 text-center">
               <Clock className="w-12 h-12 mx-auto text-muted-foreground/50 mb-3" />
-              <p className="text-sm text-muted-foreground">No transaction history yet</p>
+              <p className="text-sm text-muted-foreground">
+                No transaction history yet
+              </p>
               <p className="text-xs text-muted-foreground mt-1">
                 Transactions will appear here once your intents execute
               </p>
             </div>
           ) : (
             <div className="space-y-3">
-              {mockTransactions.map((tx) => (
+              {transactions.map((tx) => (
                 <div
                   key={tx.id}
                   className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-4 rounded-lg border border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-all"
                 >
                   <div className="flex items-start gap-3 flex-1">
-                    <div className="mt-1">
-                      <CheckCircle2 className="w-5 h-5 text-success" />
-                    </div>
+                    <div className="mt-1">{getStatusIcon(tx.status)}</div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <p className="font-medium">{tx.intentName}</p>
                         {getStatusBadge(tx.status)}
                       </div>
-                      <p className="text-sm text-muted-foreground">
-                        To: {tx.recipient}
+                      <p className="text-sm text-muted-foreground font-mono">
+                        To: {tx.recipient.slice(0, 6)}...
+                        {tx.recipient.slice(-4)}
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        {formatDistance(tx.timestamp, new Date(), { addSuffix: true })}
+                        {formatDateShort(tx.timestamp)}
                       </p>
+                      {tx.status === "FAILED" && tx.errorMessage && (
+                        <p className="text-xs text-destructive mt-1 flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3" />
+                          {tx.errorMessage}
+                        </p>
+                      )}
                     </div>
                   </div>
 
                   <div className="flex items-center gap-4 md:gap-6">
                     <div className="text-right">
                       <p className="font-semibold text-lg">
-                        {tx.amount} {tx.token}
+                        {parseFloat(tx.amount).toFixed(2)} {tx.token}
                       </p>
                       {tx.gasUsed && (
                         <p className="text-xs text-muted-foreground">
-                          Gas: {tx.gasUsed} CRO
+                          Gas: {parseFloat(tx.gasUsed).toFixed(4)} CRO
                         </p>
                       )}
                     </div>
-                    {tx.txHash && (
+                    {tx.txHash && tx.status === "SUCCESS" && (
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => window.open(`https://explorer.cronos.org/tx/${tx.txHash}`, '_blank')}
+                        onClick={() =>
+                          window.open(
+                            `https://polygonscan.com/tx/${tx.txHash}`,
+                            "_blank",
+                          )
+                        }
                       >
                         <ExternalLink className="w-3 h-3" />
                       </Button>

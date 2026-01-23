@@ -16,9 +16,13 @@ async function bootstrap() {
       configService.get("FRONTEND_URL"),
       configService.get("FRONTEND_DEV_URL"),
       "http://localhost:5173",
+      "http://localhost:8080",
+      "http://localhost:3001",
       "https://flowpayment.vercel.app",
     ],
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   });
 
   // Global validation pipe
