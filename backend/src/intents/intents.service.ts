@@ -1,0 +1,155 @@
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { BlockchainService } from "../blockchain/blockchain.service";
+
+export interface CreateIntentDto {
+  name: string;
+  description?: string;
+  recipient: string;
+  amount: number;
+  token: string;
+  tokenAddress: string;
+  frequency: string;
+  safetyBuffer: number;
+  maxGasPrice?: number;
+  timeWindowStart?: string;
+  timeWindowEnd?: string;
+  isOffRamp?: boolean;
+  offRampDetails?: any;
+}
+
+@Injectable()
+export class IntentsService {
+  constructor(
+    private prisma: PrismaService,
+    private blockchainService: BlockchainService,
+  ) {}
+
+  // Helper to serialize BigInt and Decimal for JSON
+  private serializeIntent(intent: any) {
+    if (!intent) return null;
+    return {
+      ...intent,
+      maxGasPrice: intent.maxGasPrice?.toString(),
+      amount: intent.amount?.toString(),
+      safetyBuffer: intent.safetyBuffer?.toString(),
+      onChainId: intent.onChainId?.toString(),
+      executions: intent.executions?.map((exec: any) => ({
+        ...exec,
+        amount: exec.amount?.toString(),
+        gasUsed: exec.gasUsed?.toString(),
+        gasPrice: exec.gasPrice?.toString(),
+        blockNumber: exec.blockNumber?.toString(),
+      })),
+    };
+  }
+
+  async createIntent(userId: string, data: CreateIntentDto) {
+    // Calculate next execution time
+    const nextExecution = this.calculateNextExecution(data.frequency);
+
+    const intent = await this.prisma.intent.create({
+      data: {
+        userId,
+        name: data.name,
+        description: data.description,
+        recipient: data.recipient,
+        amount: data.amount.toString(),
+        token: data.token,
+        tokenAddress: data.tokenAddress,
+        frequency: data.frequency,
+        safetyBuffer: data.safetyBuffer.toString(),
+        maxGasPrice: data.maxGasPrice
+          ? BigInt(Math.floor(data.maxGasPrice))
+          : null,
+        timeWindowStart: data.timeWindowStart,
+        timeWindowEnd: data.timeWindowEnd,
+        nextExecution,
+        isOffRamp: data.isOffRamp || false,
+        offRampDetails: data.offRampDetails,
+        status: "ACTIVE",
+      },
+    });
+
+    // Convert BigInt fields to strings for JSON serialization
+    return {
+      ...intent,
+      maxGasPrice: intent.maxGasPrice?.toString(),
+      amount: intent.amount.toString(),
+      safetyBuffer: intent.safetyBuffer.toString(),
+    };
+  }
+
+  async getUserIntents(userId: string) {
+    const intents = await this.prisma.intent.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+    });
+    return intents.map((intent) => this.serializeIntent(intent));
+  }
+
+  async getIntentById(id: string) {
+    const intent = await this.prisma.intent.findUnique({
+      where: { id },
+      include: { executions: { orderBy: { executedAt: "desc" }, take: 10 } },
+    });
+    return this.serializeIntent(intent);
+  }
+
+  async pauseIntent(id: string, userId: string) {
+    const intent = await this.prisma.intent.update({
+      where: { id, userId },
+      data: { status: "PAUSED" },
+    });
+    return this.serializeIntent(intent);
+  }
+
+  async resumeIntent(id: string, userId: string) {
+    const intent = await this.prisma.intent.update({
+      where: { id, userId },
+      data: { status: "ACTIVE" },
+    });
+    return this.serializeIntent(intent);
+  }
+
+  async deleteIntent(id: string, userId: string) {
+    const intent = await this.prisma.intent.update({
+      where: { id, userId },
+      data: { status: "CANCELLED" },
+    });
+    return this.serializeIntent(intent);
+  }
+
+  async getActiveIntents() {
+    return await this.prisma.intent.findMany({
+      where: {
+        status: "ACTIVE",
+        nextExecution: { lte: new Date() },
+      },
+      include: { user: true },
+    });
+  }
+
+  private calculateNextExecution(frequency: string): Date {
+    const now = new Date();
+
+    switch (frequency) {
+      case "DAILY":
+        now.setDate(now.getDate() + 1);
+        break;
+      case "WEEKLY":
+        now.setDate(now.getDate() + 7);
+        break;
+      case "MONTHLY":
+        now.setMonth(now.getMonth() + 1);
+        break;
+      case "YEARLY":
+        now.setFullYear(now.getFullYear() + 1);
+        break;
+      default:
+        now.setMinutes(now.getMinutes() + 5); // Default to 5 minutes
+    }
+
+    return now;
+  }
+}

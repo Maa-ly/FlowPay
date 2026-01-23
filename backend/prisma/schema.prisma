@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String         @id @default(uuid())
+  walletAddress    String         @unique @map("wallet_address")
+  telegramId       BigInt?        @unique @map("telegram_id")
+  telegramUsername String?        @map("telegram_username")
+  email            String?        @unique
+  nonce            String         @default(uuid())
+  createdAt        DateTime       @default(now()) @map("created_at")
+  lastActive       DateTime       @updatedAt @map("last_active")
+  intents          Intent[]
+  notifications    Notification[]
+
+  @@map("users")
+}
+
+model Intent {
+  id              String      @id @default(uuid())
+  userId          String      @map("user_id")
+  onChainId       BigInt?     @map("on_chain_id")
+  name            String
+  description     String?
+  recipient       String
+  amount          Decimal     @db.Decimal(20, 8)
+  token           String      @default("USDC")
+  tokenAddress    String      @map("token_address")
+  frequency       String
+  status          String      @default("ACTIVE")
+  safetyBuffer    Decimal     @map("safety_buffer") @db.Decimal(20, 8)
+  maxGasPrice     BigInt?     @map("max_gas_price")
+  timeWindowStart String?     @map("time_window_start")
+  timeWindowEnd   String?     @map("time_window_end")
+  constraints     Json?
+  nextExecution   DateTime?   @map("next_execution")
+  lastExecution   DateTime?   @map("last_execution")
+  executionCount  Int         @default(0) @map("execution_count")
+  failureCount    Int         @default(0) @map("failure_count")
+  isOffRamp       Boolean     @default(false) @map("is_off_ramp")
+  offRampDetails  Json?       @map("off_ramp_details")
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+  executions      Execution[]
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([nextExecution])
+  @@map("intents")
+}
+
+model Execution {
+  id            String   @id @default(uuid())
+  intentId      String   @map("intent_id")
+  txHash        String?  @map("tx_hash")
+  status        String
+  amount        Decimal  @db.Decimal(20, 8)
+  gasUsed       BigInt?  @map("gas_used")
+  gasPrice      BigInt?  @map("gas_price")
+  errorMessage  String?  @map("error_message")
+  delayReason   String?  @map("delay_reason")
+  blockNumber   BigInt?  @map("block_number")
+  chimoneyTxId  String?  @map("chimoney_tx_id")
+  offRampStatus String?  @map("off_ramp_status")
+  executedAt    DateTime @default(now()) @map("executed_at")
+  intent        Intent   @relation(fields: [intentId], references: [id], onDelete: Cascade)
+
+  @@index([intentId])
+  @@index([status])
+  @@index([txHash])
+  @@map("executions")
+}
+
+model Notification {
+  id      String   @id @default(uuid())
+  userId  String   @map("user_id")
+  type    String
+  title   String
+  message String
+  data    Json?
+  read    Boolean  @default(false)
+  sentAt  DateTime @default(now()) @map("sent_at")
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([read])
+  @@index([sentAt])
+  @@map("notifications")
+}
+
+model GasPrice {
+  id        String   @id @default(uuid())
+  network   String
+  gasPrice  BigInt   @map("gas_price")
+  priority  String
+  timestamp DateTime @default(now())
+
+  @@index([network])
+  @@index([timestamp])
+  @@map("gas_prices")
+}

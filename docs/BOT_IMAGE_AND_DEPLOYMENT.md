@@ -17,6 +17,7 @@
 6. **Done!** Your bot will have the new profile picture
 
 ### Image Requirements
+
 - ✅ **Size:** 512x512px (recommended)
 - ✅ **Format:** JPG, PNG, or GIF
 - ✅ **Aspect Ratio:** 1:1 (square)
@@ -24,6 +25,7 @@
 - ✅ **Quality:** High resolution, clear icon/logo
 
 ### Design Tips
+
 - Use your FlowPay logo
 - Keep it simple and recognizable
 - Use brand colors (green for FlowPay)
@@ -41,10 +43,10 @@ You have **3 separate deployments**:
 ```
 1. Frontend (Mini App)    ✅ DEPLOYED
    └─ https://flowpayment.vercel.app
-   
+
 2. Telegram Bot Backend   ⏳ OPTIONAL (can deploy later)
    └─ To be deployed to Vercel
-   
+
 3. Main Backend API       🔜 FUTURE (for smart contracts, DB, Chimoney)
    └─ Will be deployed separately
 ```
@@ -56,6 +58,7 @@ You have **3 separate deployments**:
 ### Short Answer: **NOT YET** ✅
 
 You can continue development with:
+
 - ✅ **Bot running locally** (long polling - what you're using now)
 - ✅ **Frontend deployed** (https://flowpayment.vercel.app)
 - ✅ **Users can access the Mini App** from the deployed URL
@@ -63,6 +66,7 @@ You can continue development with:
 ### When to Deploy Bot Backend?
 
 Deploy the Telegram bot backend when:
+
 1. **You want 24/7 bot availability** (not dependent on your computer being on)
 2. **You're ready for production** (after testing everything locally)
 3. **You need webhooks** (slightly faster than long polling)
@@ -93,12 +97,14 @@ Deploy the Telegram bot backend when:
 ```
 
 **Pros:**
+
 - ✅ Easy to develop and test
 - ✅ See logs in real-time
 - ✅ Quick iteration
 - ✅ No deployment costs
 
 **Cons:**
+
 - ❌ Bot only works when your computer is on
 - ❌ Can't handle many users
 - ❌ Slightly slower (long polling)
@@ -126,19 +132,21 @@ Deploy the Telegram bot backend when:
 ┌─────────────────────────────────────────────┐
 │ Main Backend API (Future)                   │
 │  ├─ Smart Contract Interaction              │
-│  ├─ Database (PostgreSQL/Supabase)          │
+│  ├─ Database (PostgreSQL/Prisma Accelerate) │
 │  ├─ Chimoney Integration                    │
 │  └─ Business Logic                          │
 └─────────────────────────────────────────────┘
 ```
 
 **Pros:**
+
 - ✅ 24/7 availability
 - ✅ Scales automatically
 - ✅ Faster (webhooks)
 - ✅ Professional setup
 
 **Cons:**
+
 - ❌ Requires deployment setup
 - ❌ Slightly more complex debugging
 
@@ -149,11 +157,13 @@ Deploy the Telegram bot backend when:
 ### Phase 1: Now (Development) ✅
 
 **What you have:**
+
 - ✅ Frontend deployed: https://flowpayment.vercel.app
 - ✅ Bot backend running locally (what you're doing now)
 - ✅ Can test everything
 
 **What to do:**
+
 1. Keep bot running locally: `npm run dev`
 2. Test with real Telegram users
 3. Iterate on features
@@ -162,12 +172,14 @@ Deploy the Telegram bot backend when:
 ### Phase 2: Later (When Ready for Production)
 
 **Deploy bot backend when:**
+
 - ✅ All features tested locally
 - ✅ No major bugs
 - ✅ Ready for real users
 - ✅ Want 24/7 availability
 
 **Steps:**
+
 1. Deploy bot to Vercel
 2. Set webhook URL
 3. Update environment variables
@@ -176,6 +188,7 @@ Deploy the Telegram bot backend when:
 ### Phase 3: Future (Complete Backend)
 
 **Deploy main backend when:**
+
 - ✅ Smart contracts deployed
 - ✅ Database schema ready
 - ✅ Chimoney integration complete
@@ -203,6 +216,7 @@ You'll get a URL like: `https://flowpay-bot.vercel.app`
 ### Step 3: Set Environment Variables in Vercel
 
 In Vercel dashboard, add:
+
 ```env
 BOT_TOKEN=your_bot_token_here
 BOT_USERNAME=your_bot_username_here
@@ -220,6 +234,7 @@ curl "https://api.telegram.org/bot<YOUR_BOT_TOKEN>/setWebhook?url=https://flowpa
 ```
 
 **Response should be:**
+
 ```json
 {
   "ok": true,
@@ -262,6 +277,7 @@ Now users will see "Open FlowPay" button in chat!
 7. **URL:** `https://flowpayment.vercel.app`
 
 Then set as main app:
+
 - `/mybots` → Select bot → Bot Settings → Mini App → Set Main Mini App
 
 ---
@@ -281,6 +297,7 @@ Then set as main app:
 ### Verify Mini App Integration
 
 In the Mini App (browser DevTools):
+
 ```javascript
 console.log(window.Telegram?.WebApp?.initDataUnsafe?.user);
 // Should show your Telegram user data
@@ -311,7 +328,7 @@ User → Telegram → Bot (Vercel) → Commands/Keyboards
                          ↓
                     Backend API
                     ├─ Smart Contracts (Cronos)
-                    ├─ Database (Supabase)
+                    ├─ Database (Prisma Accelerate)
                     └─ Chimoney API
 ```
 
@@ -320,6 +337,7 @@ User → Telegram → Bot (Vercel) → Commands/Keyboards
 ## ✅ Current Status
 
 **What's Working:**
+
 - ✅ Frontend deployed and accessible
 - ✅ Bot running locally
 - ✅ Mini App integration configured
@@ -327,6 +345,7 @@ User → Telegram → Bot (Vercel) → Commands/Keyboards
 - ✅ Inline keyboards functional
 
 **What's Next:**
+
 1. Upload bot profile image (see above)
 2. Test all features thoroughly
 3. Continue backend development
@@ -337,11 +356,13 @@ User → Telegram → Bot (Vercel) → Commands/Keyboards
 ## 🚨 Important Notes
 
 ### For Local Development:
+
 - Keep `NODE_ENV=development` in `.env`
 - Use `http://localhost:8080` for MINI_APP_URL when testing locally
 - Switch to `https://flowpayment.vercel.app` when testing with real users
 
 ### For Production:
+
 - Bot backend deployment is **optional** for now
 - You can develop everything locally
 - Deploy when you need 24/7 availability
@@ -351,14 +372,14 @@ User → Telegram → Bot (Vercel) → Commands/Keyboards
 
 ## 📞 Quick Reference
 
-| Item | Value |
-|------|-------|
-| **Bot Username** | @flowpayment_bot |
-| **Bot Link** | https://t.me/flowpayment_bot |
-| **Frontend (Deployed)** | https://flowpayment.vercel.app |
-| **Bot Backend (Local)** | http://localhost:3000 |
-| **Bot Backend (Future)** | Will deploy to Vercel |
-| **Main Backend (Future)** | Separate deployment |
+| Item                      | Value                          |
+| ------------------------- | ------------------------------ |
+| **Bot Username**          | @flowpayment_bot               |
+| **Bot Link**              | https://t.me/flowpayment_bot   |
+| **Frontend (Deployed)**   | https://flowpayment.vercel.app |
+| **Bot Backend (Local)**   | http://localhost:3000          |
+| **Bot Backend (Future)**  | Will deploy to Vercel          |
+| **Main Backend (Future)** | Separate deployment            |
 
 ---
 
@@ -367,12 +388,14 @@ User → Telegram → Bot (Vercel) → Commands/Keyboards
 **You DON'T need to deploy the bot backend yet!**
 
 Continue developing with:
+
 1. ✅ Bot running locally (`npm run dev`)
 2. ✅ Frontend on Vercel (https://flowpayment.vercel.app)
 3. ✅ Test everything
 4. ✅ Build features
 
 Deploy bot backend later when:
+
 - You're ready for production
 - You want 24/7 availability
 - You've tested everything locally

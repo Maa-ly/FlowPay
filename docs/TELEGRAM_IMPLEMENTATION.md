@@ -25,12 +25,14 @@
 FlowPay will be available on Telegram in **two powerful ways**:
 
 ### 1. **Telegram Bot** 🤖
+
 - Chat-based interface for creating and managing intents
 - Command-based interactions (`/start`, `/create`, `/dashboard`)
 - Direct notifications for intent execution
 - Voice command support (future)
 
 ### 2. **Telegram Mini App** 🌐
+
 - Full React web app **inside Telegram**
 - Same UI as standalone website
 - Seamless wallet connection (Telegram Wallet, MetaMask via TON Connect)
@@ -46,16 +48,19 @@ FlowPay will be available on Telegram in **two powerful ways**:
 1. **Open Telegram** and search for [@BotFather](https://t.me/BotFather)
 
 2. **Start a conversation** and create your bot:
+
    ```
    /newbot
    ```
 
 3. **Choose a name:**
+
    ```
    FlowPay
    ```
 
 4. **Choose a username** (must end in 'bot'):
+
    ```
    flowpay_bot
    ```
@@ -68,28 +73,37 @@ FlowPay will be available on Telegram in **two powerful ways**:
 ### Step 2: Configure Bot Settings
 
 1. **Set description:**
+
    ```
    /setdescription
    ```
+
    Then paste:
+
    ```
    FlowPay - Your AI-powered payment automation assistant for Cronos blockchain. Create smart payment intents that execute automatically when conditions are met.
    ```
 
 2. **Set about text:**
+
    ```
    /setabouttext
    ```
+
    Then paste:
+
    ```
    Automate your recurring payments, subscriptions, and conditional transfers on Cronos blockchain.
    ```
 
 3. **Set commands:**
+
    ```
    /setcommands
    ```
+
    Then paste:
+
    ```
    start - Start using FlowPay
    create - Create a new payment intent
@@ -108,21 +122,25 @@ FlowPay will be available on Telegram in **two powerful ways**:
 ### Step 3: Enable Mini App
 
 1. **Set up Mini App:**
+
    ```
    /newapp
    ```
 
 2. **Choose your bot:**
+
    ```
    @flowpay_bot
    ```
 
 3. **App title:**
+
    ```
    FlowPay
    ```
 
 4. **App description:**
+
    ```
    Automate payments on Cronos blockchain with AI-powered conditions
    ```
@@ -133,10 +151,13 @@ FlowPay will be available on Telegram in **two powerful ways**:
    - Screenshot of intent execution
 
 6. **Set app URL** (after deploying):
+
    ```
    https://your-domain.com
    ```
+
    Or use temporary URL for testing:
+
    ```
    https://your-vercel-app.vercel.app
    ```
@@ -145,6 +166,7 @@ FlowPay will be available on Telegram in **two powerful ways**:
    ```
    /mybots
    ```
+
    - Select your bot
    - Bot Settings → Mini App → Set Main Mini App
 
@@ -155,6 +177,7 @@ FlowPay will be available on Telegram in **two powerful ways**:
 ### What is a Telegram Mini App?
 
 Telegram Mini Apps are **full web applications that run inside Telegram**:
+
 - Built with standard web technologies (React, HTML, CSS, JavaScript)
 - Access to Telegram user data (name, username, photo)
 - Native Telegram UI components
@@ -183,9 +206,12 @@ Your existing React app needs **minimal changes** to work as a Telegram Mini App
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
     <title>FlowPay</title>
-    
+
     <!-- Telegram Web App SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
   </head>
@@ -234,22 +260,22 @@ export const TelegramProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
-    
+
     if (tg) {
       setIsInTelegram(true);
-      
+
       // Initialize Telegram WebApp
       tg.ready();
       tg.expand();
-      
+
       // Get user data
       if (tg.initDataUnsafe?.user) {
         setUser(tg.initDataUnsafe.user);
       }
-      
+
       // Set theme
       setTheme(tg.colorScheme || 'light');
-      
+
       // Apply Telegram theme colors
       document.documentElement.style.setProperty(
         '--tg-theme-bg-color',
@@ -269,11 +295,11 @@ export const TelegramProvider = ({ children }: { children: ReactNode }) => {
   const expand = () => window.Telegram?.WebApp?.expand();
   const close = () => window.Telegram?.WebApp?.close();
   const ready = () => window.Telegram?.WebApp?.ready();
-  
+
   const showPopup = (params: any) => window.Telegram?.WebApp?.showPopup(params);
-  
+
   const showAlert = (message: string) => window.Telegram?.WebApp?.showAlert(message);
-  
+
   const hapticFeedback = (type: 'impact' | 'notification' | 'selection') => {
     const tg = window.Telegram?.WebApp;
     if (type === 'impact') {
@@ -369,17 +395,17 @@ import { useTelegram } from "@/contexts/TelegramContext";
 
 function CreateIntentForm() {
   const { hapticFeedback, showAlert, isInTelegram } = useTelegram();
-  
+
   const handleSubmit = async (data: any) => {
     // Haptic feedback on button press (Telegram only)
     hapticFeedback('impact');
-    
+
     try {
       await createIntent(data);
-      
+
       // Success feedback
       hapticFeedback('notification');
-      
+
       if (isInTelegram) {
         showAlert('Intent created successfully!');
       } else {
@@ -389,7 +415,7 @@ function CreateIntentForm() {
       showAlert('Failed to create intent');
     }
   };
-  
+
   return (
     // Your form JSX
   );
@@ -501,42 +527,44 @@ I help you automate payments on Cronos blockchain with AI-powered conditions.
 🔹 Never miss a payment again
 
 Choose an option below or tap "Open App" for the full experience!`,
-    { reply_markup: keyboard }
+    { reply_markup: keyboard },
   );
 });
 
 // /create command
 bot.command("create", async (ctx) => {
-  const keyboard = new InlineKeyboard()
-    .webApp("Create in App", `${process.env.MINI_APP_URL}/create`);
+  const keyboard = new InlineKeyboard().webApp(
+    "Create in App",
+    `${process.env.MINI_APP_URL}/create`,
+  );
 
   await ctx.reply(
     "Let's create a new payment intent!\n\n" +
-    "Tap below to open the creation wizard:",
-    { reply_markup: keyboard }
+      "Tap below to open the creation wizard:",
+    { reply_markup: keyboard },
   );
 });
 
 // /dashboard command
 bot.command("dashboard", async (ctx) => {
-  const keyboard = new InlineKeyboard()
-    .webApp("View Dashboard", `${process.env.MINI_APP_URL}/dashboard`);
-
-  await ctx.reply(
-    "📊 View all your payment intents:",
-    { reply_markup: keyboard }
+  const keyboard = new InlineKeyboard().webApp(
+    "View Dashboard",
+    `${process.env.MINI_APP_URL}/dashboard`,
   );
+
+  await ctx.reply("📊 View all your payment intents:", {
+    reply_markup: keyboard,
+  });
 });
 
 // /app command - open full mini app
 bot.command("app", async (ctx) => {
-  const keyboard = new InlineKeyboard()
-    .webApp("🚀 Launch App", process.env.MINI_APP_URL!);
-
-  await ctx.reply(
-    "Launch the full FlowPay app:",
-    { reply_markup: keyboard }
+  const keyboard = new InlineKeyboard().webApp(
+    "🚀 Launch App",
+    process.env.MINI_APP_URL!,
   );
+
+  await ctx.reply("Launch the full FlowPay app:", { reply_markup: keyboard });
 });
 
 // /help command
@@ -560,7 +588,7 @@ bot.command("help", async (ctx) => {
 
 *Need support?*
 Contact: @flowpay_support`,
-    { parse_mode: "Markdown" }
+    { parse_mode: "Markdown" },
   );
 });
 
@@ -570,26 +598,25 @@ bot.on("callback_query:data", async (ctx) => {
 
   if (action === "create_intent") {
     await ctx.answerCallbackQuery();
-    const keyboard = new InlineKeyboard()
-      .webApp("Create Intent", `${process.env.MINI_APP_URL}/create`);
-    await ctx.editMessageText(
-      "Create a new payment intent in the app:",
-      { reply_markup: keyboard }
+    const keyboard = new InlineKeyboard().webApp(
+      "Create Intent",
+      `${process.env.MINI_APP_URL}/create`,
     );
+    await ctx.editMessageText("Create a new payment intent in the app:", {
+      reply_markup: keyboard,
+    });
   } else if (action === "view_dashboard") {
     await ctx.answerCallbackQuery();
-    const keyboard = new InlineKeyboard()
-      .webApp("View Dashboard", `${process.env.MINI_APP_URL}/dashboard`);
-    await ctx.editMessageText(
-      "View your dashboard:",
-      { reply_markup: keyboard }
+    const keyboard = new InlineKeyboard().webApp(
+      "View Dashboard",
+      `${process.env.MINI_APP_URL}/dashboard`,
     );
+    await ctx.editMessageText("View your dashboard:", {
+      reply_markup: keyboard,
+    });
   } else if (action === "help") {
     await ctx.answerCallbackQuery();
-    await bot.api.sendMessage(
-      ctx.chat!.id,
-      "For help, use /help command"
-    );
+    await bot.api.sendMessage(ctx.chat!.id, "For help, use /help command");
   }
 });
 
@@ -657,7 +684,7 @@ app.get("/health", (req, res) => {
 
 app.listen(port, async () => {
   console.log(`Server listening on port ${port}`);
-  
+
   // Set webhook URL
   const webhookUrl = `${process.env.WEBHOOK_URL}/${process.env.BOT_TOKEN}`;
   await bot.api.setWebhook(webhookUrl);
@@ -676,11 +703,13 @@ app.listen(port, async () => {
 #### Deploy Mini App (Frontend)
 
 1. **Install Vercel CLI:**
+
    ```bash
    npm install -g vercel
    ```
 
 2. **Deploy from frontend folder:**
+
    ```bash
    cd frontend
    vercel
@@ -724,6 +753,7 @@ app.listen(port, async () => {
 ```
 
 2. **Deploy:**
+
    ```bash
    cd telegram-bot
    vercel
@@ -766,11 +796,13 @@ app.listen(port, async () => {
 **Best for serverless functions**
 
 1. **Install Wrangler:**
+
    ```bash
    npm install -g wrangler
    ```
 
 2. **Create worker:**
+
    ```bash
    wrangler init telegram-bot
    ```
@@ -786,19 +818,20 @@ app.listen(port, async () => {
 
 ## 💰 Free Hosting Options Summary
 
-| Platform | Frontend | Backend | Database | Cost |
-|----------|----------|---------|----------|------|
-| **Vercel** | ✅ Free | ✅ Free | ❌ | **FREE** |
-| **Railway** | ✅ Free | ✅ Free | ✅ Free | **FREE** (500h/mo) |
-| **Render** | ✅ Free | ✅ Free | ✅ Free | **FREE** (spins down) |
-| **Netlify** | ✅ Free | ✅ Functions | ❌ | **FREE** |
-| **Cloudflare** | ✅ Free | ✅ Workers | ✅ D1 | **FREE** |
-| **Deno Deploy** | ✅ Free | ✅ Free | ✅ KV | **FREE** |
+| Platform        | Frontend | Backend      | Database | Cost                  |
+| --------------- | -------- | ------------ | -------- | --------------------- |
+| **Vercel**      | ✅ Free  | ✅ Free      | ❌       | **FREE**              |
+| **Railway**     | ✅ Free  | ✅ Free      | ✅ Free  | **FREE** (500h/mo)    |
+| **Render**      | ✅ Free  | ✅ Free      | ✅ Free  | **FREE** (spins down) |
+| **Netlify**     | ✅ Free  | ✅ Functions | ❌       | **FREE**              |
+| **Cloudflare**  | ✅ Free  | ✅ Workers   | ✅ D1    | **FREE**              |
+| **Deno Deploy** | ✅ Free  | ✅ Free      | ✅ KV    | **FREE**              |
 
 **Recommended Setup (100% Free):**
+
 - **Frontend (Mini App):** Vercel
 - **Bot Backend:** Vercel Serverless Functions
-- **Database:** Supabase (PostgreSQL - Free tier)
+- **Database:** Prisma Accelerate (PostgreSQL - Connection pooling)
 - **File Storage:** Cloudflare R2 (Free tier)
 
 **Total Cost: $0/month for up to 100,000 users!**
@@ -849,7 +882,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 function WalletButton() {
   const { isInTelegram } = useTelegram();
-  
+
   return isInTelegram ? (
     <TonConnectButton /> {/* Native Telegram wallet */}
   ) : (
@@ -876,7 +909,7 @@ bot.command("subscribe", async (ctx) => {
     "subscription_premium",
     "", // No provider needed for Stars
     "XTR", // Telegram Stars currency
-    [{ label: "Monthly Subscription", amount: 100 }] // 100 Stars
+    [{ label: "Monthly Subscription", amount: 100 }], // 100 Stars
   );
 });
 
@@ -888,10 +921,10 @@ bot.on("pre_checkout_query", async (ctx) => {
 bot.on("message:successful_payment", async (ctx) => {
   const payment = ctx.message.successful_payment;
   console.log(`Payment received: ${payment.total_amount} ${payment.currency}`);
-  
+
   // Activate premium features
   await activatePremium(ctx.from.id);
-  
+
   await ctx.reply("✅ Payment successful! Premium features activated.");
 });
 ```
@@ -906,14 +939,14 @@ import { parseEther } from 'viem';
 
 function PaymentButton() {
   const { sendTransaction } = useSendTransaction();
-  
+
   const handlePayment = () => {
     sendTransaction({
       to: '0xRecipient',
       value: parseEther('10'), // 10 CRO
     });
   };
-  
+
   return <button onClick={handlePayment}>Pay with CRO</button>;
 }
 ```
@@ -925,16 +958,19 @@ function PaymentButton() {
 ### Testing Your Bot Locally
 
 1. **Start ngrok** (for webhook testing):
+
    ```bash
    ngrok http 3001
    ```
 
 2. **Update webhook URL:**
+
    ```bash
    export WEBHOOK_URL=https://your-ngrok-url.ngrok.io
    ```
 
 3. **Start bot:**
+
    ```bash
    npm run dev
    ```
@@ -984,29 +1020,33 @@ Telegram has a **test environment** for development:
 ### Security
 
 1. **Validate Telegram Data:**
-   ```typescript
-   import crypto from 'crypto';
 
-   function validateTelegramWebAppData(initData: string, botToken: string): boolean {
+   ```typescript
+   import crypto from "crypto";
+
+   function validateTelegramWebAppData(
+     initData: string,
+     botToken: string,
+   ): boolean {
      const urlParams = new URLSearchParams(initData);
-     const hash = urlParams.get('hash');
-     urlParams.delete('hash');
-     
+     const hash = urlParams.get("hash");
+     urlParams.delete("hash");
+
      const dataCheckString = Array.from(urlParams.entries())
        .sort(([a], [b]) => a.localeCompare(b))
        .map(([key, value]) => `${key}=${value}`)
-       .join('\n');
-     
+       .join("\n");
+
      const secretKey = crypto
-       .createHmac('sha256', 'WebAppData')
+       .createHmac("sha256", "WebAppData")
        .update(botToken)
        .digest();
-     
+
      const calculatedHash = crypto
-       .createHmac('sha256', secretKey)
+       .createHmac("sha256", secretKey)
        .update(dataCheckString)
-       .digest('hex');
-     
+       .digest("hex");
+
      return hash === calculatedHash;
    }
    ```
@@ -1020,33 +1060,37 @@ Telegram has a **test environment** for development:
 ### UX/UI
 
 1. **Use Telegram theme colors:**
+
    ```typescript
    const tg = window.Telegram?.WebApp;
-   const bgColor = tg?.themeParams?.bg_color || '#ffffff';
+   const bgColor = tg?.themeParams?.bg_color || "#ffffff";
    ```
 
 2. **Enable haptic feedback:**
+
    ```typescript
-   tg?.HapticFeedback?.impactOccurred('medium');
+   tg?.HapticFeedback?.impactOccurred("medium");
    ```
 
 3. **Show loading states:**
+
    ```typescript
    tg?.MainButton?.showProgress();
    ```
 
 4. **Handle viewport changes:**
    ```typescript
-   tg?.onEvent('viewportChanged', () => {
-     console.log('Viewport changed:', tg.viewportHeight);
+   tg?.onEvent("viewportChanged", () => {
+     console.log("Viewport changed:", tg.viewportHeight);
    });
    ```
 
 ### Performance
 
 1. **Lazy load components:**
+
    ```typescript
-   const Dashboard = lazy(() => import('./pages/Dashboard'));
+   const Dashboard = lazy(() => import("./pages/Dashboard"));
    ```
 
 2. **Optimize images** for mobile
@@ -1062,7 +1106,7 @@ Send notifications when intents execute:
 ```typescript
 async function notifyUser(userId: number, message: string) {
   await bot.api.sendMessage(userId, message, {
-    parse_mode: 'Markdown',
+    parse_mode: "Markdown",
   });
 }
 
@@ -1070,10 +1114,10 @@ async function notifyUser(userId: number, message: string) {
 await notifyUser(
   123456789,
   `✅ *Payment Executed*\n\n` +
-  `Intent: Monthly Rent\n` +
-  `Amount: 500 CRO\n` +
-  `To: 0x742d...3a67\n` +
-  `Status: Confirmed`
+    `Intent: Monthly Rent\n` +
+    `Amount: 500 CRO\n` +
+    `To: 0x742d...3a67\n` +
+    `Status: Confirmed`,
 );
 ```
 
@@ -1082,19 +1126,23 @@ await notifyUser(
 ## 📱 Complete User Flow
 
 ### 1. Discovery
+
 User finds bot through:
+
 - Search: `@flowpay_bot`
 - Direct link: `https://t.me/flowpay_bot`
 - Friend referral
 - QR code
 
 ### 2. Onboarding
+
 1. User sends `/start`
 2. Bot shows welcome message with options
 3. User taps "Open App"
 4. Mini App launches inside Telegram
 
 ### 3. Using the App
+
 1. Connect wallet (TON Connect or MetaMask)
 2. Create payment intent
 3. Bot sends confirmation notification
@@ -1102,6 +1150,7 @@ User finds bot through:
 5. User receives notification
 
 ### 4. Managing Intents
+
 - View dashboard in Mini App
 - Edit intents via bot commands
 - Receive execution notifications
@@ -1133,18 +1182,21 @@ User finds bot through:
 ## 📚 Resources
 
 ### Official Documentation
+
 - **Telegram Bots:** https://core.telegram.org/bots
 - **Telegram Mini Apps:** https://core.telegram.org/bots/webapps
 - **grammY Framework:** https://grammy.dev
 - **Bot API Reference:** https://core.telegram.org/bots/api
 
 ### Useful Tools
+
 - **@BotFather:** Create and manage bots
 - **@WebAppBot:** Test web apps
 - **Telegram Test Environment:** For development
 - **ngrok:** Local webhook testing
 
 ### Community
+
 - **grammY Chat:** https://t.me/grammyjs
 - **Telegram Bot Developers:** https://t.me/BotDevelopment
 - **TON Dev:** https://t.me/tondev_eng
